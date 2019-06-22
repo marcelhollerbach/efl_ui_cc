@@ -1,0 +1,19 @@
+{
+  "ui-name" : "Simple_Button",
+  "ui-content" : {
+    "type": "Efl.Ui.Box",
+    "id" : "root",
+    "pack-linear" : [
+      {
+        "type" : "Efl.Ui.Button",
+        "id" : "btn",
+        "text" : "Print",
+      },
+      {
+        "type" : "Efl.Ui.Button",
+        "id" : "quit",
+        "text" : "Quit",
+      },
+    ]
+   },
+}

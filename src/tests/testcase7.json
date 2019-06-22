@@ -1,0 +1,35 @@
+{
+  "ui-name" : "testcase",
+  "ui-content" : {
+    "type": "Efl.Ui.Radio_Box",
+    "id" : "basic",
+    "orientation" : 1,
+    "pack-linear" : [
+      {
+        "type" : "Efl.Ui.Radio",
+        "text" : "Alpha",
+        "state_value" : 1,
+      },
+      {
+        "type" : "Efl.Ui.Radio",
+        "text" : "Beta",
+        "state_value" : 2,
+      },
+      {
+        "type" : "Efl.Ui.Radio",
+        "text" : "Gamma",
+        "state_value" : 3,
+      },
+      {
+        "type" : "Efl.Ui.Radio",
+        "text" : "Xi",
+        "state_value" : 4,
+      },
+      {
+        "type" : "Efl.Ui.Radio",
+        "text" : "Delta",
+        "state_value" : 5,
+      },
+    ],
+   },
+}

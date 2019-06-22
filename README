@@ -1,0 +1,32 @@
+efl_ui_cc is a little transpiler that creates c code form a json file.
+
+The json file can be used to describe a UI, it may look like this:
+{
+  "ui-name" : "Example",
+  "ui-content" : {
+    "type": "Efl.Ui.Box",
+    "id" : "box",
+    "pack-linear" : [
+      {
+        "type" : "Efl.Ui.Image",
+        "file" : "cool-file.png",
+        "id" : "img",
+        "align" : [0.0, 1.0],
+      },
+      {
+        "type" : "Efl.Ui.Check",
+        "id" : "txt",
+        "text" : "Only show black and white channels",
+      },
+      {
+        "type" : "Efl.Ui.Button",
+        "id" : "btn",
+        "text" : "Safe",
+      },
+    ],
+   },
+}
+
+The result will be two files, one header file and one c file.
+The header file is used to export API for creating this UI in c, additionally, a data strcuture is returned that will contain all the widgets that have a id.
+The C file itself is just generated c code, It has to be compiled as a standalone c file into your project so the API is available.

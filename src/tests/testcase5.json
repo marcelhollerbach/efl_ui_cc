@@ -1,0 +1,33 @@
+{
+  "ui-name" : "testcase",
+  "ui-content" : {
+    "type": "Efl.Ui.Table",
+    "id" : "basic",
+    "pack-table" : [
+      {
+        "type" : "Efl.Ui.Image",
+        "file" : "cool-file.png",
+        "id" : "img",
+        "x" : 1,
+        "y" : 2,
+        "align" : [0.0, 1.0],
+      },
+      {
+        "type" : "Efl.Ui.Button",
+        "id" : "btn",
+        "x" : 3,
+        "y" : 3,
+        "w" : 5,
+        "h" : 5,
+        "text" : "!!--??",
+      },
+      {
+        "type" : "Efl.Ui.Check",
+        "id" : "txt",
+        "x" : 11,
+        "y" : 11,
+        "text" : "And here we go!",
+      },
+    ],
+   },
+}

@@ -1,0 +1,14 @@
+{
+  "ui-name" : "testcase",
+  "ui-content" : {
+    "type": "Efl.Ui.Button",
+    "id" : "basic",
+    "text": "test",
+    "content" :
+      {
+        "type" : "Efl.Ui.Image",
+        "file" : "cool-file.png",
+        "align" : [0.0, 1.0],
+      },
+   },
+}
