@@ -62,7 +62,7 @@ int main(int argc, char const *argv[])
           {
              beta_support = EINA_TRUE;
           }
-        if (!strcmp(argv[i], "-I"))
+        else if (!strcmp(argv[i], "-I"))
           {
              if (i + 1 >= argc - 3)
                {
@@ -83,6 +83,10 @@ int main(int argc, char const *argv[])
                        return -1;
                     }
                }
+          }
+        else
+          {
+            printf("Not understood token : %s\n", argv[i]);
           }
      }
 
