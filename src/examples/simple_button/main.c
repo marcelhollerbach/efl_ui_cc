@@ -28,8 +28,8 @@ efl_main(void *data EINA_UNUSED, const Efl_Event *ev EINA_UNUSED)
 
 
    Simple_Button_Data *pd = simple_button_gen(win);
-   efl_event_callback_add(pd->btn, EFL_UI_EVENT_CLICKED, _clicked_cb, NULL);
-   efl_event_callback_add(pd->quit, EFL_UI_EVENT_CLICKED, _quit_clicked_cb, NULL);
+   efl_event_callback_add(pd->btn, EFL_INPUT_EVENT_CLICKED, _clicked_cb, NULL);
+   efl_event_callback_add(pd->quit, EFL_INPUT_EVENT_CLICKED, _quit_clicked_cb, NULL);
    efl_content_set(win, pd->root);
 }
 EFL_MAIN()

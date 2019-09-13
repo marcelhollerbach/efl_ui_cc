@@ -8,7 +8,7 @@
         "type" : "Efl.Ui.Image",
         "file" : "cool-file.png",
         "id" : "img",
-        "align" : [0.0, 1.0],
+        "hint_align" : [0.0, 1.0],
       },
       {
         "type" : "Efl.Ui.Button",
