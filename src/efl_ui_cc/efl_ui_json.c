@@ -177,7 +177,8 @@ parse_pack_linear(Parser_Scope *scope, Eina_Strbuf *api_calls, int return_pos)
           }
 
         cs = parser_scope_inherit(scope, last_pos);
-        parse_ui_element(cs, NULL, NULL);
+        if (!parse_ui_element(cs, NULL, NULL))
+          return EINA_FALSE;
         parser_scope_merge(api_calls, cs);
         eina_strbuf_append(api_calls, "   efl_pack_end(o, child);\n");
 
