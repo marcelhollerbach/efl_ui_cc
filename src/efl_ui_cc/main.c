@@ -3,6 +3,7 @@
 #include <Eina.h>
 #include <Eolian.h>
 #include <unistd.h>
+#include <Efl_Ui_Format.h>
 
 const char *input_file = NULL;
 const char *output_c_file = NULL;
@@ -46,8 +47,35 @@ output_content(void)
    dump_output(output_h_file, c_header_content);
 }
 
+static Eolian_State *state;
+
+static Eina_Bool
+_flush_include_dirs(const void *fdata, void *path, void *data)
+{
+   eolian_state_directory_add(data, path);
+
+   return EINA_TRUE;
+}
+
+void
+class_db_init(Eina_Bool support, Eina_Array *include_dirs)
+{
+   beta_support = support;
+   eolian_init();
+
+   state = eolian_state_new();
+   if (!eolian_state_system_directory_add(state))
+     {
+        printf("Error, Adding system directory failed!\n");
+        abort();
+     }
+
+   eina_array_foreach(include_dirs, _flush_include_dirs, state);
+}
+
 int main(int argc, char const *argv[])
 {
+   Efl_Ui *ui;
    Eina_Array *arr = eina_array_new(5);
    eina_init();
 
@@ -103,8 +131,17 @@ int main(int argc, char const *argv[])
    class_db_init(beta_support, arr);
 
    load_content();
-   parse();
 
+   ui = efl_ui_format_parse(input_content);
+
+   if (!validate(state, ui))
+     exit(-1);
+
+   if (!c_output(state, ui))
+     exit(-1);
+
+   efl_ui_free(ui);
+   eina_array_free(arr);
    output_content();
    eina_shutdown();
    return 0;

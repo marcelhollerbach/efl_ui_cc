@@ -3,6 +3,7 @@ project('efl-ui',
   version: '0.1'
 )
 
+subdir(join_paths('src', 'lib'))
 subdir(join_paths('src', 'efl_ui_cc'))
 subdir(join_paths('src', 'tests'))
 subdir(join_paths('src', 'examples', 'simple_button'))
