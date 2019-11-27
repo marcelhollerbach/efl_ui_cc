@@ -35,6 +35,7 @@ _output_node(Generator_Context *ctx, Outputter_Node *n)
         Outputter_Property_Value *value;
         Eina_Strbuf *params = eina_strbuf_new();
         eina_strbuf_append(params, "o");
+        int i = 0;
 
         EINA_ITERATOR_FOREACH(property->values, value)
           {
@@ -45,12 +46,14 @@ _output_node(Generator_Context *ctx, Outputter_Node *n)
                }
              else
                {
+                  const char *func_name = eolian_object_name_get(EOLIAN_OBJECT(property->property));
                   Eina_Strbuf *buf = _output_node(ctx, value->object);
                   eina_strbuf_append_buffer(func_calls, buf);
-                  eina_strbuf_append(params, "child");
+                  eina_strbuf_append_printf(func_calls, "   Eo *%s%d = child;\n", func_name, i);
+                  eina_strbuf_append_printf(params, "%s%d", func_name, i);
                   eina_strbuf_free(buf);
-                  //FIXME what if one property takes multiple objects ?
                }
+             i++;
           }
         eina_iterator_free(property->values);
         eina_strbuf_append_printf(func_calls, "   %s(%s);\n", eolian_function_full_c_name_get(property->property, EOLIAN_PROP_SET), eina_strbuf_string_get(params));
