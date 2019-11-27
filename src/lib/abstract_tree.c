@@ -1,4 +1,6 @@
-#include "efl_ui_format_privat.h"
+#include "Efl_Ui_Format.h"
+#include "Internal.h"
+#include "abstract_tree_private.h"
 
 static Efl_Ui_Node*
 create_node(void)
@@ -76,7 +78,6 @@ node_pack_linear_node_append(Efl_Ui_Node *node)
    inner_node = calloc(1, sizeof(Efl_Ui_Pack_Linear));
    inner_node->node = create_node();
    eina_array_push(node->children, inner_node);
-
    return inner_node;
 }
 

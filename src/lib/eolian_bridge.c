@@ -1,4 +1,5 @@
-#include "efl_ui_format_privat.h"
+#include "Efl_Ui_Format.h"
+#include "Internal.h"
 #define EFL_BETA_API_SUPPORT
 #include <Eolian_Aux.h>
 

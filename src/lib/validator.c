@@ -1,4 +1,6 @@
-#include "efl_ui_format_privat.h"
+#include "Efl_Ui_Format.h"
+#include "Internal.h"
+#include "abstract_tree_private.h"
 
 typedef struct {
    Eolian_State *s;

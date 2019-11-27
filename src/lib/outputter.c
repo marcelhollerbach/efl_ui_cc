@@ -1,4 +1,6 @@
-#include "efl_ui_format_privat.h"
+#include "Efl_Ui_Format.h"
+#include "Internal.h"
+#include "abstract_tree_private.h"
 
 struct _Outputter_Node {
    const Eolian_Class *klass;
