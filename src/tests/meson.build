@@ -22,3 +22,12 @@ foreach test : tests
     timeout: 30,
   )
 endforeach
+
+predictor = executable('predictor',
+  'test_predictor.c',
+  dependencies: [dependency('elementary'), dependency('eolian'), dependency('check'), efl_ui_format]
+)
+
+test('test_predictor', predictor,
+  is_parallel: true,
+)

@@ -1,5 +1,5 @@
 tmp = library('efl_ui_cc_format',
-    ['abstract_tree.c', 'Efl_Ui_Format.h', 'parser.c', 'validator.c', 'outputter.c', 'eolian_bridge.c'],
+    ['abstract_tree.c', 'Efl_Ui_Format.h', 'parser.c', 'validator.c', 'outputter.c', 'eolian_bridge.c', 'predictor.c'],
     dependencies : [dependency('eina'), dependency('eolian')]
 )
 
