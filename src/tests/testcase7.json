@@ -3,7 +3,7 @@
   "ui-content" : {
     "type": "Efl.Ui.Radio_Box",
     "id" : "basic",
-    "orientation" : 1,
+    "orientation" : horizontal,
     "pack-linear" : [
       {
         "type" : "Efl.Ui.Radio",

@@ -15,6 +15,11 @@ typedef struct {
    Eina_Array *values;
 } Inner_Outputter_Property;
 
+typedef struct {
+   Outputter_Property_Value value;
+   const Eolian_Type *type;
+} Inner_Outputter_Property_Value;
+
 const Eolian_Class*
 outputter_node_klass_get(Outputter_Node *node)
 {
@@ -36,17 +41,61 @@ create_outputter_node(Eolian_State *s, Efl_Ui_Node *content)
    return node;
 }
 
-static void
-_outputter_properties_values_fill(Outputter_Node *node, Inner_Outputter_Property *iprop, Efl_Ui_Property *prop)
+static const char*
+_fetch_real_value(Eolian_Function_Parameter *parameter, const char *code_value)
 {
-   Eina_Iterator *values;
-   Efl_Ui_Property_Value *val;
-   iprop->values = eina_array_new(10);
-   values = eina_array_iterator_new(prop->value);
+   const Eolian_Type *etype = eolian_parameter_type_get(parameter);
+   const Eolian_Type_Type type = eolian_type_type_get(etype);
 
-   EINA_ITERATOR_FOREACH(values, val)
+   if (type == EOLIAN_TYPE_REGULAR)
      {
-        Outputter_Property_Value *value = calloc(1, sizeof(Outputter_Property_Value));
+        const Eolian_Typedecl *decl = eolian_type_typedecl_get(etype);
+        if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
+          {
+             Eina_Iterator *iter = eolian_typedecl_enum_fields_get(decl);
+             Eolian_Enum_Type_Field *v;
+
+             EINA_ITERATOR_FOREACH(iter, v)
+               {
+                  const char *possible_value = eolian_typedecl_enum_field_name_get(v);
+
+                  if (eina_streq(code_value, possible_value))
+                    {
+                       eina_iterator_free(iter);
+                       return eolian_typedecl_enum_field_c_constant_get(v);
+                    }
+               }
+             //nothing can happen here, validator would have catched anything weird here
+          }
+        else
+          {
+             Eolian_Type_Builtin_Type builtin = eolian_type_builtin_type_get(etype);
+             if (builtin == EOLIAN_TYPE_BUILTIN_BOOL)
+               {
+                  if (eina_streq(code_value, "true"))
+                    return "EINA_TRUE";
+                  else if (eina_streq(code_value, "false"))
+                    return "EINA_FALSE";
+               }
+          }
+     }
+   return code_value;
+
+}
+
+static void
+_outputter_properties_values_fill(Outputter_Node *node, Inner_Outputter_Property *iprop, Efl_Ui_Property *prop, Eina_Iterator *parameters)
+{
+   Eolian_Function_Parameter *parameter;
+   int i = 0;
+
+   iprop->values = eina_array_new(10);
+
+   EINA_ITERATOR_FOREACH(parameters, parameter)
+     {
+        Efl_Ui_Property_Value *val = eina_array_data_get(prop->value, i);
+        Outputter_Property_Value *value = calloc(1, sizeof(Inner_Outputter_Property_Value));
+
         if (val->is_node)
           {
              value->simple = EINA_FALSE;
@@ -55,11 +104,12 @@ _outputter_properties_values_fill(Outputter_Node *node, Inner_Outputter_Property
         else
           {
              value->simple = EINA_TRUE;
-             value->value = val->value;
+             value->value = _fetch_real_value(parameter, val->value);
           }
         eina_array_push(iprop->values, value);
+        i ++;
      }
-   eina_iterator_free(values);
+   eina_iterator_free(parameters);
 }
 
 Eina_Iterator*
@@ -75,7 +125,7 @@ outputter_properties_get(Outputter_Node *node)
      {
         Inner_Outputter_Property *oprop = calloc(1, sizeof(Inner_Outputter_Property));
         oprop->prop.property = find_function(node->s, node->klass, prop->key);
-        _outputter_properties_values_fill(node, oprop, prop);
+        _outputter_properties_values_fill(node, oprop, prop, eolian_property_values_get(oprop->prop.property, EOLIAN_PROP_SET));
         oprop->prop.values = eina_array_iterator_new(oprop->values);
         eina_array_push(node->properties, oprop);
      }
