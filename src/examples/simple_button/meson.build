@@ -1,5 +1,5 @@
 gen_files = custom_target('simple_button_gen',
-  input: 'simple_button.json',
+  input: 'simple_button.eflui',
   output: ['simple_button.c', 'simple_button.h'],
   command: [efl_ui_cc, '--beta-support', '@INPUT@', '@OUTPUT0@', '@OUTPUT1@']
 )

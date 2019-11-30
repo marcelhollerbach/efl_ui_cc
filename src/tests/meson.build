@@ -5,7 +5,7 @@ env.set('TEST_IN_TREE', '1')
 
 foreach test : tests
   gen_files = custom_target(test+'_gen',
-    input: test+'.json',
+    input: test+'.eflui',
     output: [test+'.c', test+'.h'],
     command: [efl_ui_cc, '--beta-support', '@INPUT@', '@OUTPUT0@', '@OUTPUT1@']
   )

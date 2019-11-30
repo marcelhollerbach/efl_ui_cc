@@ -1,5 +1,5 @@
 gen_files = custom_target('detail_display_gen',
-  input: 'detail_display.json',
+  input: 'detail_display.eflui',
   output: ['detail_display.c', 'detail_display.h'],
   command: [efl_ui_cc, '--beta-support', '@INPUT@', '@OUTPUT0@', '@OUTPUT1@']
 )
