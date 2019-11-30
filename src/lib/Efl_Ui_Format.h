@@ -49,6 +49,8 @@ typedef struct {
   };
 } Outputter_Child;
 
+void eolian_bridge_beta_allowed_set(Eina_Bool beta_awareness);
+
 Eina_Iterator *outputter_properties_get(Outputter_Node *node);
 Eina_Iterator *outputter_children_get(Outputter_Node *node);
 const Eolian_Class* outputter_node_klass_get(Outputter_Node *node);

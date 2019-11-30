@@ -3,6 +3,24 @@
 #define EFL_BETA_API_SUPPORT
 #include <Eolian_Aux.h>
 
+static Eina_Bool _beta_allowed = EINA_FALSE;
+
+void
+eolian_bridge_beta_allowed_set(Eina_Bool beta_allowed)
+{
+   _beta_allowed = EINA_TRUE;
+}
+
+static Eina_Bool
+is_allowed(const Eolian_Object *obj)
+{
+   if (!_beta_allowed)
+     {
+        return !eolian_object_is_beta(obj);
+     }
+   return EINA_TRUE;
+}
+
 const Eolian_Class*
 find_klass(Eolian_State *s, const char *klass)
 {
@@ -30,12 +48,16 @@ find_function(Eolian_State *s, const Eolian_Class *klass, const char *prop)
    Eina_List *n;
    Eolian_Implement *impl;
 
+   EINA_SAFETY_ON_FALSE_RETURN_VAL(is_allowed(EOLIAN_OBJECT(klass)), NULL);
+
    eolian_aux_class_callables_get(klass, &functions, NULL, NULL, NULL);
 
    EINA_LIST_FOREACH(functions, n, impl)
      {
         Eolian_Function_Type type;
         const Eolian_Function *f;
+
+        EINA_SAFETY_ON_FALSE_RETURN_VAL(is_allowed(EOLIAN_OBJECT(impl)), NULL);
 
         f = eolian_implement_function_get(impl, &type);
         if (eina_streq(eolian_function_name_get(f), prop) && (type == EOLIAN_PROP_SET || type == EOLIAN_PROPERTY))
@@ -67,7 +89,6 @@ find_all_widgets(Eolian_State *state)
    const Eolian_Class *widget;
    Eolian_Class *klass;
 
-
    widget = eolian_state_class_by_name_get(state, "Efl.Ui.Widget");
    EINA_SAFETY_ON_NULL_RETURN_VAL(widget, NULL);
    result = eina_array_new(10);
@@ -76,7 +97,8 @@ find_all_widgets(Eolian_State *state)
    EINA_ITERATOR_FOREACH(it, klass)
      {
         if (eolian_class_type_get(klass) == EOLIAN_CLASS_REGULAR &&
-            eolian_class_isa(klass, widget))
+            eolian_class_isa(klass, widget) &&
+            is_allowed(EOLIAN_OBJECT(klass)))
           eina_array_push(result, klass);
      }
 
@@ -98,12 +120,16 @@ find_all_properties(Eolian_State *state, const char *klass_name)
    widget = eolian_state_class_by_name_get(state, "Efl.Ui.Widget");
    EINA_SAFETY_ON_FALSE_RETURN_VAL(eolian_class_isa(klass, widget), NULL);
    EINA_SAFETY_ON_FALSE_RETURN_VAL(eolian_class_type_get(klass) == EOLIAN_CLASS_REGULAR, NULL);
+   EINA_SAFETY_ON_FALSE_RETURN_VAL(is_allowed(EOLIAN_OBJECT(klass)), NULL);
    eolian_aux_class_callables_get(klass, &functions, NULL, NULL, NULL);
 
    EINA_LIST_FOREACH(functions, n, impl)
      {
         Eolian_Function_Type type;
         const Eolian_Function *f;
+
+        if (!is_allowed(EOLIAN_OBJECT(impl)))
+          continue;
 
         f = eolian_implement_function_get(impl, &type);
         if ((type == EOLIAN_PROP_SET || type == EOLIAN_PROPERTY))
@@ -125,11 +151,13 @@ find_all_arguments(Eolian_State *state, const char *klass_name, const char *prop
    Eina_Array *result;
    Eolian_Function_Parameter *p;
 
-   klass = find_klass(state, klass_name);
    widget = eolian_state_class_by_name_get(state, "Efl.Ui.Widget");
+   klass = find_klass(state, klass_name);
    EINA_SAFETY_ON_FALSE_RETURN_VAL(eolian_class_isa(klass, widget), NULL);
    EINA_SAFETY_ON_FALSE_RETURN_VAL(eolian_class_type_get(klass) == EOLIAN_CLASS_REGULAR, NULL);
+   EINA_SAFETY_ON_FALSE_RETURN_VAL(is_allowed(EOLIAN_OBJECT(klass)), NULL);
    f = find_function(state, klass, property);
+   EINA_SAFETY_ON_FALSE_RETURN_VAL(is_allowed(EOLIAN_OBJECT(f)), NULL);
    EINA_SAFETY_ON_NULL_RETURN_VAL(f, NULL);
    iter = eolian_property_values_get(f, EOLIAN_PROP_SET);
    result = eina_array_new(10);

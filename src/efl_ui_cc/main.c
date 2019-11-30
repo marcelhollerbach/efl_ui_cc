@@ -71,6 +71,8 @@ class_db_init(Eina_Bool support, Eina_Array *include_dirs)
      }
 
    eina_array_foreach(include_dirs, _flush_include_dirs, state);
+
+   eolian_bridge_beta_allowed_set(beta_support);
 }
 
 int main(int argc, char const *argv[])
