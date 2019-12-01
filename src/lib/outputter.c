@@ -173,6 +173,11 @@ outputter_children_get(Outputter_Node *node)
    return eina_array_iterator_new(node->children);
 }
 
+enum Efl_Ui_Node_Children_Type
+outputter_node_type_get(Outputter_Node *node)
+{
+   return node->node->usage_type;
+}
 
 Outputter_Node*
 outputter_node_init(Eolian_State *s, Efl_Ui* ui, const char **name)

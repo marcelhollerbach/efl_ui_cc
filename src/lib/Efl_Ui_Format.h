@@ -57,6 +57,8 @@ const Eolian_Class* outputter_node_klass_get(Outputter_Node *node);
 const char* outputter_node_id_get(Outputter_Node *node);
 Outputter_Node* outputter_node_init(Eolian_State *s, Efl_Ui* ui, const char **name);
 void outputter_node_root_free(Outputter_Node* node);
+enum Efl_Ui_Node_Children_Type outputter_node_type_get(Outputter_Node *node);
+
 
 Efl_Ui* efl_ui_new(void);
 void efl_ui_name_set(Efl_Ui *ui, const char *name);
