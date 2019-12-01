@@ -70,7 +70,11 @@ efl_main(void *data EINA_UNUSED, const Efl_Event *ev EINA_UNUSED)
              abort();
           }
      }
-   EINA_SAFETY_ON_NULL_RETURN(input_file);
+   if (!input_file)
+     {
+        printf("No file given\n");
+        abort();
+     }
    eolian_bridge_beta_allowed_set(beta_support);
    if (!eolian_state_system_directory_add(editor_state))
      {
@@ -83,7 +87,7 @@ efl_main(void *data EINA_UNUSED, const Efl_Event *ev EINA_UNUSED)
                  efl_ui_win_autodel_set(efl_added, EINA_TRUE)
                 );
 
-   efl_gfx_entity_size_set(win, EINA_SIZE2D(320, 320));
    load_content();
+   efl_content_set(win, object_generator(win, editor_state, ui_tree));
 }
 EFL_MAIN()

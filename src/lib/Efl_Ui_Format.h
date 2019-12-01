@@ -14,11 +14,13 @@ void efl_ui_free(Efl_Ui *ui);
 typedef struct _Outputter_Node Outputter_Node;
 
 typedef struct {
+  const Eolian_Type *type;
   Eina_Bool simple;
   union {
     Outputter_Node *object;
     const char *value;
   };
+  const char *real_value;
 } Outputter_Property_Value;
 
 typedef struct {

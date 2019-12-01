@@ -95,7 +95,7 @@ _outputter_properties_values_fill(Outputter_Node *node, Inner_Outputter_Property
      {
         Efl_Ui_Property_Value *val = eina_array_data_get(prop->value, i);
         Outputter_Property_Value *value = calloc(1, sizeof(Inner_Outputter_Property_Value));
-
+        value->type = eolian_parameter_type_get(parameter);
         if (val->is_node)
           {
              value->simple = EINA_FALSE;
@@ -104,6 +104,7 @@ _outputter_properties_values_fill(Outputter_Node *node, Inner_Outputter_Property
         else
           {
              value->simple = EINA_TRUE;
+             value->real_value = val->value;
              value->value = _fetch_real_value(parameter, val->value);
           }
         eina_array_push(iprop->values, value);
