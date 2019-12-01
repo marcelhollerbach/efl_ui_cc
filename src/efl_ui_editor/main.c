@@ -19,7 +19,6 @@ load_content(void)
    file = eina_file_open(input_file, EINA_FALSE);
    input_content = eina_file_map_all(file, EINA_FILE_SEQUENTIAL);
    ui_tree  = efl_ui_format_parse(input_content);
-   json_output(editor_state, ui_tree);
 }
 
 EAPI_MAIN void
@@ -70,6 +69,7 @@ efl_main(void *data EINA_UNUSED, const Efl_Event *ev EINA_UNUSED)
              abort();
           }
      }
+   eina_accessor_free(cma);
    if (!input_file)
      {
         printf("No file given\n");
@@ -88,6 +88,5 @@ efl_main(void *data EINA_UNUSED, const Efl_Event *ev EINA_UNUSED)
                 );
 
    load_content();
-   efl_content_set(win, object_generator(win, editor_state, ui_tree));
 }
 EFL_MAIN()

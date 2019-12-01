@@ -67,6 +67,7 @@ _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
                }
              i++;
           }
+        eina_iterator_free(property->values);
         eina_strbuf_append(current_object, ",\n");
      }
    eina_iterator_free(properties);
@@ -128,7 +129,7 @@ json_output(const Eolian_State *s, const Efl_Ui *ui)
    eina_strbuf_replace_all(main_func, "\n", "\n  ");
    eina_strbuf_append_buffer(type, main_func);
    eina_strbuf_append(type, "\n}\n");
-   json_output = eina_strbuf_string_steal(type);
+   json_output = eina_strdup(eina_strbuf_string_get(type));
    eina_strbuf_free(type);
    eina_strbuf_free(main_func);
    outputter_node_root_free(start);

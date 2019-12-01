@@ -192,7 +192,7 @@ _call_property(Object_Generator_Context *ctx, Eo *obj, Outputter_Property *prope
         values[value_count] = &pointers[value_count];
         value_count ++;
      }
-
+   eina_iterator_free(property->values);
    EINA_SAFETY_ON_FALSE_RETURN_VAL(ffi_prep_cif(&cif, FFI_DEFAULT_ABI, value_count, &ffi_type_void, types) == FFI_OK, EINA_FALSE);
    ffi_call(&cif, eo_func, &ffi_type_void, values);
 
@@ -255,5 +255,7 @@ object_generator(Efl_Ui_Win *win, const Eolian_State *s, const Efl_Ui *ui)
    const char *name;
 
    Outputter_Node *root = outputter_node_init((Eolian_State*)s, (Efl_Ui*)ui, &name);
-   return _generate_node(&ctx, root, win);
+   Eo *ret = _generate_node(&ctx, root, win);
+   outputter_node_root_free(root);
+   return ret;
 }
