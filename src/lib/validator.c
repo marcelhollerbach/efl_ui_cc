@@ -133,9 +133,6 @@ validate_property(Validator_Context *ctx, const Eolian_Class *klass, Efl_Ui_Prop
                if (!validate_node(ctx, value->node))
                  return EINA_FALSE;
              break;
-             case EOLIAN_TYPE_ERROR:
-              //FIXME
-             break;
              default:
                EINA_LOG_ERR("This is an error");
              break;
