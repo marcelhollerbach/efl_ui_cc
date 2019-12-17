@@ -8,7 +8,7 @@ static Eina_Bool _beta_allowed = EINA_FALSE;
 void
 eolian_bridge_beta_allowed_set(Eina_Bool beta_allowed)
 {
-   _beta_allowed = EINA_TRUE;
+   _beta_allowed = beta_allowed;
 }
 
 static Eina_Bool
