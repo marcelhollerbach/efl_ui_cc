@@ -64,7 +64,7 @@ START_TEST(test_predictor_properties_details)
    for (int i = 0; details[i].name; ++i)
      {
         details_argument_count++;
-        ck_assert_int_eq(details[i].type, TYPE_BOOL);
+        ck_assert_ptr_ne(details[i].type, NULL);
      }
    ck_assert_int_eq(details_argument_count, 1);
 

@@ -55,7 +55,6 @@ _outputter_properties_values_fill(Outputter_Node *node, Inner_Outputter_Property
    int i = 0;
 
    iprop->values = eina_array_new(10);
-
    EINA_ITERATOR_FOREACH(parameters, parameter)
      {
         Efl_Ui_Property_Value *val = eina_array_data_get(prop->value, i);

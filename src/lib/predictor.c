@@ -77,18 +77,9 @@ get_available_property_details(Efl_Ui_Node *node, const char *property_name)
      {
          const Eolian_Function_Parameter *param = eina_array_data_get(tmp_array, i);
          const Eolian_Type *type = eolian_parameter_type_get(param);
-         Eolian_Type_Builtin_Type builtin = eolian_type_builtin_type_get(type);
-         Eolian_Type_Type ttype = eolian_type_type_get(type);
 
          predirect_obj_init(&details[i].obj, "TODO", EINA_TRUE);
-         if (builtin >= EOLIAN_TYPE_BUILTIN_BYTE && builtin <= EOLIAN_TYPE_BUILTIN_PTRDIFF)
-           details[i].type = TYPE_NUMBER;
-         else if (builtin >= EOLIAN_TYPE_BUILTIN_MSTRING && builtin <= EOLIAN_TYPE_BUILTIN_STRINGSHARE)
-           details[i].type = TYPE_STRING;
-         else if (builtin == EOLIAN_TYPE_BUILTIN_BOOL)
-           details[i].type = TYPE_BOOL;
-         else if (ttype != EOLIAN_TYPE_UNKNOWN_TYPE)
-           details[i].type = TYPE_OBJECT;
+         details[i].type = type;
          details[i].name = eolian_parameter_name_get(param);
      }
 

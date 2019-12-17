@@ -54,10 +54,22 @@ Eina_Future*
 select_avaible_value(Outputter_Property_Value *value, Eo *anchor_widget)
 {
    Value_Selection *selection = calloc(sizeof(Value_Selection), 1);
-   Eolian_Type_Builtin_Type builtin = eolian_type_builtin_type_get(value->type);
 
    selection->ctx = efl_loop_promise_new(efl_main_loop_get());
-   if (builtin >= EOLIAN_TYPE_BUILTIN_BYTE && builtin <= EOLIAN_TYPE_BUILTIN_PTRDIFF)
+   const Eolian_Type *etype = value->type;
+   const Eolian_Type_Builtin_Type btype = eolian_type_builtin_type_get(etype);
+   const Eolian_Typedecl *decl = eolian_type_typedecl_get(etype);
+
+   if (btype >= EOLIAN_TYPE_BUILTIN_BYTE && btype <= EOLIAN_TYPE_BUILTIN_UINT128)
+     {
+        Value_Change_Range_Ui_Data *data = value_change_range_ui_gen(anchor_widget);
+        selection->popup = data->root;
+        selection->set = data->ok;
+        selection->selector = data->range_selector;
+        selection->get_value = _fetch_range_cb;
+        efl_ui_range_value_set(data->range_selector, atoi(value->value));
+     }
+   else if (btype >= EOLIAN_TYPE_BUILTIN_FLOAT && btype <= EOLIAN_TYPE_BUILTIN_DOUBLE)
      {
         Value_Change_Range_Ui_Data *data = value_change_range_ui_gen(anchor_widget);
         selection->popup = data->root;
@@ -66,16 +78,7 @@ select_avaible_value(Outputter_Property_Value *value, Eo *anchor_widget)
         selection->get_value = _fetch_range_cb;
         efl_ui_range_value_set(data->range_selector, atof(value->value));
      }
-   else if (builtin >= EOLIAN_TYPE_BUILTIN_MSTRING && builtin <= EOLIAN_TYPE_BUILTIN_STRINGSHARE)
-     {
-        Value_Change_Text_Ui_Data *data = value_change_text_ui_gen(anchor_widget);
-        selection->popup = data->root;
-        selection->set = data->ok;
-        selection->selector = data->text_selector;
-        selection->get_value = _fetch_text_cb;
-        efl_text_set(data->text_selector, value->value);
-     }
-   else if (builtin == EOLIAN_TYPE_BUILTIN_BOOL)
+   else if (btype == EOLIAN_TYPE_BUILTIN_BOOL)
      {
         Value_Change_Bool_Ui_Data *data = value_change_bool_ui_gen(anchor_widget);
         selection->popup = data->root;
@@ -84,9 +87,9 @@ select_avaible_value(Outputter_Property_Value *value, Eo *anchor_widget)
         selection->get_value = _fetch_bool_cb;
         efl_ui_radio_group_selected_value_set(data->boolean_selector, eina_streq(value->value, "true"));
      }
-   else
+   else if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
      {
-        EINA_LOG_ERR("Builtin %d not handled\n", builtin);
+        printf("NOT IMPLEMENTED YET\n");
         return NULL;
      }
 

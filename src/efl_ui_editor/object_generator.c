@@ -92,19 +92,25 @@ fill_in_data(void *ctx, const Eolian_Type *type, const Outputter_Property_Value 
 {
    Eolian_Type_Builtin_Type builtin = eolian_type_builtin_type_get(type);
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(value->value, EINA_FALSE);
+
    if (builtin >= EOLIAN_TYPE_BUILTIN_BYTE && builtin <= EOLIAN_TYPE_BUILTIN_PTRDIFF)
      {
-        *data = (void*)(intptr_t)atoi(value->value);
+        char *tmp = strdupa(value->value);
+        int i = atoi(tmp);
+        memmove(data, &i, sizeof(int));
      }
    else if (builtin >= EOLIAN_TYPE_BUILTIN_FLOAT && builtin <= EOLIAN_TYPE_BUILTIN_DOUBLE)
      {
-        *data = (void*)(intptr_t)atof(value->value);
+        char *tmp = strdupa(value->value);
+        double d = atof(tmp);
+        memcpy(data, &d, sizeof(double));
      }
    else if (builtin == EOLIAN_TYPE_BUILTIN_BOOL)
      {
-        if (eina_streq(value->value, "EINA_TRUE"))
+        if (eina_streq(value->value, "true"))
           *data = (void*)(intptr_t)EINA_TRUE;
-        else if (eina_streq(value->value, "EINA_FALSE"))
+        else if (eina_streq(value->value, "false"))
           *data = (void*)(intptr_t)EINA_FALSE;
         else
           {
@@ -169,10 +175,10 @@ _call_property(Object_Generator_Context *ctx, Eo *obj, Outputter_Property *prope
                   //fetch value of the field that is used
                   const Eolian_Expression *exp = eolian_typedecl_enum_field_value_get(field, EINA_TRUE);
                   Eolian_Value val = eolian_expression_value_get(exp);
-                  int value = val.value.u;
+                  int uvalue = val.value.u;
 
                   types[value_count] = &ffi_type_uint32;
-                  pointers[value_count] = (void*)(intptr_t)value;
+                  pointers[value_count] = (void*)(intptr_t)uvalue;
                }
              else
                {
@@ -251,8 +257,6 @@ _generate_node(Object_Generator_Context *ctx, Outputter_Node *n, Efl_Ui_Widget *
 void
 _obj_gen_transform_value_cb(const Eolian_Type *etype, Eina_Strbuf *buf, const char *value)
 {
-   const Eolian_Type_Type type = eolian_type_type_get(etype);
-   EINA_SAFETY_ON_FALSE_RETURN(type == EOLIAN_TYPE_REGULAR);
    const Eolian_Type_Builtin_Type bt = eolian_type_builtin_type_get(etype);
 
    if (bt == EOLIAN_TYPE_BUILTIN_STRING || bt == EOLIAN_TYPE_BUILTIN_STRINGSHARE || bt == EOLIAN_TYPE_BUILTIN_MSTRING)

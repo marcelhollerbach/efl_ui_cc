@@ -21,18 +21,9 @@ struct _Predicted_Property {
    const char *name;
 };
 
-enum _Predicted_Property_Details_Type {
-  TYPE_BOOL = 4,
-  TYPE_NUMBER = 3,
-  TYPE_OBJECT = 2,
-  TYPE_STRING = 1,
-
-  TYPE_WHAT_THE_FUCK = 0
-};
-
 struct _Predicted_Property_Details {
    Predicted_Object obj;
-   Predicted_Property_Details_Type type;
+   const Eolian_Type *type;
    const char *name;
 };
 

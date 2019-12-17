@@ -146,24 +146,35 @@ add_property(Efl_Ui_Node *node, const char *prop_name)
    for (int i = 0; details[i].name; ++i)
      {
         Efl_Ui_Property_Value *value = property_value_append(property);
+        const Eolian_Type *etype = details[i].type;
+        const Eolian_Type_Builtin_Type btype = eolian_type_builtin_type_get(etype);
+        const Eolian_Class *klass = eolian_type_class_get(etype);
+        const Eolian_Typedecl *decl = eolian_type_typedecl_get(etype);
 
-        if (details[i].type == TYPE_OBJECT)
+
+        if (klass)
           {
              Efl_Ui_Node *node = property_value_node(value);
              node_type_set(node, "Efl.Ui.Button");
           }
-        else if (details[i].type == TYPE_NUMBER)
+        else if (btype >= EOLIAN_TYPE_BUILTIN_BYTE && btype <= EOLIAN_TYPE_BUILTIN_UINT128)
           {
              property_value_value(value, "0");
           }
-        else if (details[i].type == TYPE_BOOL)
+        else if (btype >= EOLIAN_TYPE_BUILTIN_FLOAT && btype <= EOLIAN_TYPE_BUILTIN_DOUBLE)
+          {
+             property_value_value(value, "0.0");
+          }
+        else if (btype == EOLIAN_TYPE_BUILTIN_BOOL)
           {
              property_value_value(value, "false");
           }
-        //FIXME enum value
-        else
+        else if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
           {
-             property_value_value(value, "\"<Empty>\"");
+             Eolian_Enum_Type_Field *field = NULL;
+             Eina_Iterator *fields = eolian_typedecl_enum_fields_get(decl);
+             EINA_SAFETY_ON_FALSE_RETURN(eina_iterator_next(fields, (void**) &field));
+             property_value_value(value, eolian_typedecl_enum_field_name_get(field));
           }
      }
    EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
