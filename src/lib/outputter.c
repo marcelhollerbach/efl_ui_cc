@@ -68,7 +68,7 @@ _fetch_real_value(Eolian_Function_Parameter *parameter, const char *code_value)
                   if (eina_streq(code_value, possible_value))
                     {
                        eina_iterator_free(iter);
-                       return eolian_typedecl_enum_field_c_constant_get(v);
+                       return eina_strdup(eolian_typedecl_enum_field_c_constant_get(v));
                     }
                }
              //nothing can happen here, validator would have catched anything weird here
@@ -79,20 +79,13 @@ _fetch_real_value(Eolian_Function_Parameter *parameter, const char *code_value)
              if (builtin == EOLIAN_TYPE_BUILTIN_BOOL)
                {
                   if (eina_streq(code_value, "true"))
-                    return "EINA_TRUE";
+                    return eina_strdup("EINA_TRUE");
                   else if (eina_streq(code_value, "false"))
-                    return "EINA_FALSE";
-               }
-             else if (builtin == EOLIAN_TYPE_BUILTIN_MSTRING || builtin == EOLIAN_TYPE_BUILTIN_STRING || builtin == EOLIAN_TYPE_BUILTIN_STRINGSHARE)
-               {
-                  char *tmp = eina_strdup(code_value);
-                  tmp ++;
-                  tmp[strlen(tmp) - 1] = '\0';
-                  return tmp;
+                    return eina_strdup("EINA_FALSE");
                }
           }
      }
-   return code_value;
+   return eina_strdup(code_value);
 
 }
 
@@ -232,8 +225,14 @@ _outputter_node_free(Outputter_Node *node)
             Outputter_Property_Value *value = eina_array_pop(prop->values);
 
             if (!value->simple)
-              _outputter_node_free(value->object);
-
+              {
+                 _outputter_node_free(value->object);
+              }
+            else
+              {
+                 if (value->value)
+                   free((char*)value->value);
+              }
             free(value);
           }
         eina_array_free(prop->values);
