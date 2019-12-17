@@ -15,12 +15,14 @@ create_node(void)
 void
 node_id_set(Efl_Ui_Node *n, const char *id)
 {
+   if (n->id) free((char*)n->id);
    n->id = eina_strdup(id);
 }
 
 void
 node_type_set(Efl_Ui_Node *n, const char *type)
 {
+   if (n->type) free((char*)n->type);
    n->type = eina_strdup(type);
 }
 
@@ -39,6 +41,7 @@ node_property_append(Efl_Ui_Node *n)
 void
 property_key_set(Efl_Ui_Property *prop, const char *key)
 {
+   if (prop->key) free((char*) prop->key);
    prop->key = eina_strdup(key);
 }
 
@@ -66,6 +69,7 @@ void
 property_value_value(Efl_Ui_Property_Value *val, const char *value)
 {
    val->is_node = EINA_FALSE;
+   if (val->value) free((char*)val->value);
    val->value = eina_strdup(value);
 }
 
@@ -118,6 +122,7 @@ efl_ui_new(void)
 void
 efl_ui_name_set(Efl_Ui *ui, const char *name)
 {
+   if (ui->name) free((char*)ui->name);
    ui->name = eina_strdup(name);
 }
 
@@ -218,4 +223,10 @@ enum Efl_Ui_Node_Children_Type
 node_child_type_get(Efl_Ui_Node *node)
 {
    return node->usage_type;
+}
+
+const char*
+node_id_get(Efl_Ui_Node *n)
+{
+   return n->id;
 }

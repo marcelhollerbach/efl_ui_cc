@@ -21,11 +21,10 @@ change_type(Efl_Ui_Node *node, const char *type)
 
    EINA_SAFETY_ON_NULL_RETURN(klass);
 
-   free((char*)node->type);
    node_type_set(node, type);
    int shifter = 0;
 
-   for (int i = 0; eina_array_count(node->properties); ++i)
+   for (int i = 0; i < eina_array_count(node->properties); ++i)
      {
         Efl_Ui_Property *prop = eina_array_data_get(node->properties, i);
 
@@ -218,10 +217,16 @@ del_property(Efl_Ui_Node *node, const char *prop_name)
 }
 
 void
+change_id(Efl_Ui_Node *node, const char *new_id)
+{
+   node_id_set(node, new_id);
+   EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
+   propagate_tree_change();
+}
+
+void
 change_parameter_type(Efl_Ui_Property_Value *value, const char *v)
 {
-   if (value->value)
-     free((char*)value->value);
    property_value_value(value, v);
    EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
    propagate_tree_change();

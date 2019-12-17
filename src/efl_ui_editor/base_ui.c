@@ -326,11 +326,13 @@ _invalidate_cb(void *data, const Efl_Event *ev)
    free(stack);
 }
 
+
 static void
 push_ui_node(Outputter_Node *node, Eina_Bool back_support)
 {
    Local_Stack *stack = calloc(sizeof(Local_Stack), 1);
 
+   update_stack = eina_array_new(10);
    stack->data = abstract_node_ui_gen(base_ui->prop_stack);
    stack->tnode = outputter_node_get(node);
    stack->onode = node;
@@ -354,6 +356,9 @@ push_ui_node(Outputter_Node *node, Eina_Bool back_support)
         stack->parent = highest;
         highest = stack;
      }
+   EINA_SAFETY_ON_FALSE_RETURN(eina_array_count(update_stack) == 0);
+   eina_array_free(update_stack);
+   update_stack = NULL;
 }
 
 void
@@ -378,12 +383,8 @@ base_ui_refresh(Efl_Ui *ui)
 
    if (!root && !highest)
      {
-        update_stack = eina_array_new(10);
         push_ui_node(oroot, EINA_FALSE);
         EINA_SAFETY_ON_FALSE_RETURN(root && root->onode == oroot);
-        EINA_SAFETY_ON_FALSE_RETURN(eina_array_count(update_stack) == 0);
-        eina_array_free(update_stack);
-        update_stack = NULL;
      }
    else
      {

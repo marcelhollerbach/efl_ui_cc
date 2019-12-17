@@ -172,7 +172,10 @@ validate_node(Validator_Context *ctx, Efl_Ui_Node *node)
    EINA_ITERATOR_FOREACH(it, property)
      {
         if (!validate_property(ctx, klass, property))
-          return EINA_FALSE;
+          {
+             eina_iterator_free(it);
+             return EINA_FALSE;
+          }
      }
 
    eina_iterator_free(it);
@@ -188,7 +191,10 @@ validate_node(Validator_Context *ctx, Efl_Ui_Node *node)
         EINA_ITERATOR_FOREACH(it, linear)
           {
              if (!validate_node(ctx, linear->node))
-               return EINA_FALSE;
+               {
+                  eina_iterator_free(it);
+                  return EINA_FALSE;
+               }
           }
      }
    else if (node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE)
@@ -198,7 +204,10 @@ validate_node(Validator_Context *ctx, Efl_Ui_Node *node)
         EINA_ITERATOR_FOREACH(it, table)
           {
              if (!validate_node(ctx, table->node))
-               return EINA_FALSE;
+               {
+                  eina_iterator_free(it);
+                  return EINA_FALSE;
+               }
           }
      }
    else if (node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK)
@@ -208,9 +217,13 @@ validate_node(Validator_Context *ctx, Efl_Ui_Node *node)
         EINA_ITERATOR_FOREACH(it, pack)
           {
              if (!validate_node(ctx, pack->node))
-               return EINA_FALSE;
+               {
+                  eina_iterator_free(it);
+                  return EINA_FALSE;
+               }
              if (!pack->part_name)
                {
+                  eina_iterator_free(it);
                   printf("Part name required\n");
                   return EINA_FALSE;
                }
