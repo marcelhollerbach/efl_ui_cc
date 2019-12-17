@@ -40,6 +40,7 @@ change_type(Efl_Ui_Node *node, const char *type)
     node->properties->count -= shifter;
 
     //FIXME remove children if needed
+    node->usage_type = fetch_usage(editor_state, type);
 
     EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
     propagate_tree_change();
@@ -168,6 +169,10 @@ add_property(Efl_Ui_Node *node, const char *prop_name)
         else if (btype == EOLIAN_TYPE_BUILTIN_BOOL)
           {
              property_value_value(value, "false");
+          }
+        else if (btype == EOLIAN_TYPE_BUILTIN_MSTRING || btype == EOLIAN_TYPE_BUILTIN_STRING || btype == EOLIAN_TYPE_BUILTIN_STRINGSHARE)
+          {
+             property_value_value(value, "<Empty>");
           }
         else if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
           {

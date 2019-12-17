@@ -87,6 +87,15 @@ select_avaible_value(Outputter_Property_Value *value, Eo *anchor_widget)
         selection->get_value = _fetch_bool_cb;
         efl_ui_radio_group_selected_value_set(data->boolean_selector, eina_streq(value->value, "true"));
      }
+   else if (btype == EOLIAN_TYPE_BUILTIN_MSTRING || btype == EOLIAN_TYPE_BUILTIN_STRING || btype == EOLIAN_TYPE_BUILTIN_STRINGSHARE)
+     {
+        Value_Change_Text_Ui_Data *data = value_change_text_ui_gen(anchor_widget);
+        selection->popup = data->root;
+        selection->set = data->ok;
+        selection->selector = data->text_selector;
+        selection->get_value = _fetch_text_cb;
+        efl_text_set(data->text_selector, value->value);
+     }
    else if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
      {
         printf("NOT IMPLEMENTED YET\n");
