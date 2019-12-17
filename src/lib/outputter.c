@@ -12,11 +12,13 @@ struct _Outputter_Node {
 
 typedef struct {
    Outputter_Property prop;
+   Efl_Ui_Property *real_prop;
    Eina_Array *values;
 } Inner_Outputter_Property;
 
 typedef struct {
    Outputter_Property_Value value;
+   Efl_Ui_Property_Value *pvalue;
    const Eolian_Type *type;
 } Inner_Outputter_Property_Value;
 
@@ -36,8 +38,12 @@ static Outputter_Node*
 create_outputter_node(Eolian_State *s, Efl_Ui_Node *content)
 {
    Outputter_Node *node = calloc(1, sizeof(Outputter_Node));
+   EINA_SAFETY_ON_NULL_RETURN_VAL(s, NULL);
    node->klass = find_klass(s, content->type);
+   if (!node->klass)
+     EINA_SAFETY_ON_NULL_RETURN_VAL(node->klass, NULL);
    node->node = content;
+   node->s = s;
    return node;
 }
 
@@ -77,6 +83,13 @@ _fetch_real_value(Eolian_Function_Parameter *parameter, const char *code_value)
                   else if (eina_streq(code_value, "false"))
                     return "EINA_FALSE";
                }
+             else if (builtin == EOLIAN_TYPE_BUILTIN_MSTRING || builtin == EOLIAN_TYPE_BUILTIN_STRING || builtin == EOLIAN_TYPE_BUILTIN_STRINGSHARE)
+               {
+                  char *tmp = eina_strdup(code_value);
+                  tmp ++;
+                  tmp[strlen(tmp) - 1] = '\0';
+                  return tmp;
+               }
           }
      }
    return code_value;
@@ -94,18 +107,20 @@ _outputter_properties_values_fill(Outputter_Node *node, Inner_Outputter_Property
    EINA_ITERATOR_FOREACH(parameters, parameter)
      {
         Efl_Ui_Property_Value *val = eina_array_data_get(prop->value, i);
-        Outputter_Property_Value *value = calloc(1, sizeof(Inner_Outputter_Property_Value));
-        value->type = eolian_parameter_type_get(parameter);
+        Inner_Outputter_Property_Value *value = calloc(1, sizeof(Inner_Outputter_Property_Value));
+        value->pvalue = val;
+        value->value.argument = eolian_parameter_name_get(parameter);
+        value->value.type = eolian_parameter_type_get(parameter);
         if (val->is_node)
           {
-             value->simple = EINA_FALSE;
-             value->object = create_outputter_node(node->s, val->node);
+             value->value.simple = EINA_FALSE;
+             value->value.object = create_outputter_node(node->s, val->node);
           }
         else
           {
-             value->simple = EINA_TRUE;
-             value->real_value = val->value;
-             value->value = _fetch_real_value(parameter, val->value);
+             value->value.simple = EINA_TRUE;
+             value->value.real_value = val->value;
+             value->value.value = _fetch_real_value(parameter, val->value);
           }
         eina_array_push(iprop->values, value);
         i ++;
@@ -125,6 +140,7 @@ outputter_properties_get(Outputter_Node *node)
    EINA_ITERATOR_FOREACH(properties, prop)
      {
         Inner_Outputter_Property *oprop = calloc(1, sizeof(Inner_Outputter_Property));
+        oprop->real_prop = prop;
         oprop->prop.property = find_function(node->s, node->klass, prop->key);
         _outputter_properties_values_fill(node, oprop, prop, eolian_property_values_get(oprop->prop.property, EOLIAN_PROP_SET));
         oprop->prop.values = eina_array_iterator_new(oprop->values);
@@ -185,6 +201,8 @@ outputter_node_init(Eolian_State *s, Efl_Ui* ui, const char **name)
 {
    Outputter_Node *n;
 
+   EINA_SAFETY_ON_NULL_RETURN_VAL(s, NULL);
+
    n = create_outputter_node(s, ui->content);
 
    n->s = s;
@@ -196,7 +214,7 @@ outputter_node_init(Eolian_State *s, Efl_Ui* ui, const char **name)
 static void
 _outputter_node_free(Outputter_Node *node)
 {
-   while (eina_array_count(node->children))
+   while (node->children && eina_array_count(node->children))
      {
         Outputter_Child *child;
 
@@ -205,7 +223,7 @@ _outputter_node_free(Outputter_Node *node)
         free(child);
      }
    eina_array_free(node->children);
-   while (eina_array_count(node->properties))
+   while (node->properties && eina_array_count(node->properties))
      {
         Inner_Outputter_Property *prop = eina_array_pop(node->properties);
 
@@ -229,4 +247,22 @@ void
 outputter_node_root_free(Outputter_Node* node)
 {
    _outputter_node_free(node);
+}
+
+Efl_Ui_Node*
+outputter_node_get(Outputter_Node *node)
+{
+   return node->node;
+}
+
+Efl_Ui_Property*
+outputter_property_property_get(Outputter_Property *prop)
+{
+   return ((Inner_Outputter_Property*)prop)->real_prop;
+}
+
+Efl_Ui_Property_Value*
+outputter_property_value_value_get(Outputter_Property_Value *val)
+{
+   return ((Inner_Outputter_Property_Value*)val)->pvalue;
 }

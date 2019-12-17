@@ -20,7 +20,16 @@ predirect_obj_init(Predicted_Object *obj, const char *doc, Eina_Bool freeable)
    obj->internal = (void*)(intptr_t)freeable;
 }
 
-const Predicted_Class*
+static int
+_compare_available_types(const void *a, const void *b)
+{
+   const Predicted_Class *a_klass = a;
+   const Predicted_Class *b_klass = b;
+
+   return strcmp(a_klass->klass_name, b_klass->klass_name);
+}
+
+Predicted_Class*
 get_available_types(void)
 {
    if (!all_widgets)
@@ -35,12 +44,13 @@ get_available_types(void)
               predirect_obj_init(&all_widgets[i].obj, eolian_documentation_description_get(eolian_class_documentation_get(klass)), EINA_FALSE);
               all_widgets[i].klass_name = eolian_class_name_get(klass);
            }
+         qsort(all_widgets, eina_array_count(w), sizeof(Predicted_Class), _compare_available_types);
          eina_array_free(w);
      }
    return all_widgets;
 }
 
-const Predicted_Property*
+Predicted_Property*
 get_available_properties(Efl_Ui_Node *node)
 {
    Eina_Array *tmp_array = find_all_properties(state, node->type);
@@ -53,10 +63,11 @@ get_available_properties(Efl_Ui_Node *node)
         predirect_obj_init(&result[i].obj, "TODO", EINA_TRUE);
         result[i].name = eolian_function_name_get(f);
      }
+   eina_array_free(tmp_array);
    return result;
 }
 
-const Predicted_Property_Details*
+Predicted_Property_Details*
 get_available_property_details(Efl_Ui_Node *node, const char *property_name)
 {
    Eina_Array *tmp_array = find_all_arguments(state, node->type, property_name);

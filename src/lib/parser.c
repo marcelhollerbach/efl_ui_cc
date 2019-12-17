@@ -421,15 +421,21 @@ efl_ui_format_parse(const char *c)
             tokens_max_pos = r;
           }
      }
-
-   //eat the upper structure
-   tokens_current_pos++;
-   Efl_Ui *ui = efl_ui_new();
-
-   if (!parse_ui_description(ui, strlen(input_content)))
+   if (tokens_max_pos)
      {
-        printf("Parsing failed\n");
+        //eat the upper structure
+        tokens_current_pos++;
+        Efl_Ui *ui = efl_ui_new();
+
+        if (!parse_ui_description(ui, strlen(input_content)))
+          {
+             printf("Parsing failed\n");
+             return NULL;
+          }
+        return ui;
+     }
+   else
+     {
         return NULL;
      }
-   return ui;
 }

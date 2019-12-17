@@ -38,6 +38,6 @@ struct _Predicted_Property_Details {
 
 void predictor_init(Eolian_State *s);
 
-const Predicted_Class* get_available_types(void);
-const Predicted_Property* get_available_properties(Efl_Ui_Node *node);
-const Predicted_Property_Details* get_available_property_details(Efl_Ui_Node *node, const char *property_name);
+Predicted_Class* get_available_types(void);
+Predicted_Property* get_available_properties(Efl_Ui_Node *node);
+Predicted_Property_Details* get_available_property_details(Efl_Ui_Node *node, const char *property_name);

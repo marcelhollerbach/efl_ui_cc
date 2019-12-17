@@ -128,7 +128,7 @@ efl_ui_content_get(Efl_Ui *ui)
    return ui->content;
 }
 
-static void
+void
 efl_ui_node_free(Efl_Ui_Node *node)
 {
    if (node->id)
@@ -212,4 +212,10 @@ efl_ui_free(Efl_Ui *ui)
      free((char*)ui->name);
    efl_ui_node_free(ui->content);
    free(ui);
+}
+
+enum Efl_Ui_Node_Children_Type
+node_child_type_get(Efl_Ui_Node *node)
+{
+   return node->usage_type;
 }

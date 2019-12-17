@@ -103,6 +103,13 @@ validate_property(Validator_Context *ctx, const Eolian_Class *klass, Efl_Ui_Prop
      {
         const Eolian_Type *type = eolian_parameter_type_get(parameter);
         Efl_Ui_Property_Value *value = eina_array_data_get(node->value, c);
+        const Eolian_Typedecl *decl = eolian_type_typedecl_get(type);
+
+        while(eolian_typedecl_aliased_base_get(decl))
+          {
+             type = eolian_typedecl_aliased_base_get(decl);
+             decl = eolian_type_typedecl_get(type);
+          }
 
         switch(eolian_type_type_get(type))
           {
@@ -112,7 +119,6 @@ validate_property(Validator_Context *ctx, const Eolian_Class *klass, Efl_Ui_Prop
              case EOLIAN_TYPE_REGULAR:
                {
                   //a regular can be a number or a enum it seems ?
-                  const Eolian_Typedecl *decl = eolian_type_typedecl_get(type);
                   if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
                     {
                        if (!validate_enum_values(ctx, decl, value))
@@ -227,5 +233,12 @@ Eina_Bool
 validate(Eolian_State *state, Efl_Ui *ui)
 {
    Validator_Context ctx = {state};
-   return validate_node(&ctx, ui->content);
+
+   if (!ui)
+     return EINA_TRUE;
+
+   if (ui->content)
+     return validate_node(&ctx, ui->content);
+   else
+     return EINA_TRUE;
 }

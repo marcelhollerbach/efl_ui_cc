@@ -21,6 +21,7 @@ typedef struct {
     const char *value;
   };
   const char *real_value;
+  const char *argument;
 } Outputter_Property_Value;
 
 typedef struct {
@@ -61,6 +62,9 @@ Outputter_Node* outputter_node_init(Eolian_State *s, Efl_Ui* ui, const char **na
 void outputter_node_root_free(Outputter_Node* node);
 enum Efl_Ui_Node_Children_Type outputter_node_type_get(Outputter_Node *node);
 
+Efl_Ui_Node *outputter_node_get(Outputter_Node *node);
+Efl_Ui_Property* outputter_property_property_get(Outputter_Property *prop);
+Efl_Ui_Property_Value* outputter_property_value_value_get(Outputter_Property_Value *val);
 
 Efl_Ui* efl_ui_new(void);
 void efl_ui_name_set(Efl_Ui *ui, const char *name);

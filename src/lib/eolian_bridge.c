@@ -72,10 +72,21 @@ find_function(Eolian_State *s, const Eolian_Class *klass, const char *prop)
 static Eina_Bool
 eolian_class_isa(const Eolian_Class *a, const Eolian_Class *b)
 {
+   const Eolian_Class *c;
    do
      {
         if (a == b)
           return EINA_TRUE;
+        Eina_Iterator *iter;
+
+        iter = eolian_class_extensions_get(a);
+        EINA_ITERATOR_FOREACH(iter, c)
+          {
+             if (eolian_class_isa(c, b))
+               return EINA_TRUE;
+          }
+        eina_iterator_free(iter);
+
         a = eolian_class_parent_get(a);
    } while (a);
    return EINA_FALSE;
@@ -169,4 +180,24 @@ find_all_arguments(Eolian_State *state, const char *klass_name, const char *prop
    eina_iterator_free(iter);
 
    return result;
+}
+
+enum Efl_Ui_Node_Children_Type
+fetch_usage(Eolian_State *state, const char *klass)
+{
+   const Eolian_Class *eolian_klass = find_klass(state, klass);
+   const Eolian_Class *pack_linear = find_klass(state, "Efl.Pack_Linear");
+   const Eolian_Class *pack_table = find_klass(state, "Efl.Pack_Table");
+   const Eolian_Class *pack_part = find_klass(state, "Efl.Part");
+
+   if (eolian_class_isa(eolian_klass, pack_linear))
+     return EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR;
+
+   if (eolian_class_isa(eolian_klass, pack_table))
+     return EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE;
+
+   if (eolian_class_isa(eolian_klass, pack_part))
+     return EFL_UI_NODE_CHILDREN_TYPE_PACK;
+
+   return EFL_UI_NODE_CHILDREN_TYPE_NOTHING;
 }

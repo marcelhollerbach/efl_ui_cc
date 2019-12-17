@@ -18,3 +18,8 @@ void property_value_value(Efl_Ui_Property_Value *val, const char *value);
 Efl_Ui_Pack_Linear* node_pack_linear_node_append(Efl_Ui_Node *node);
 Efl_Ui_Pack_Table* node_pack_table_node_append(Efl_Ui_Node *node);
 Efl_Ui_Pack_Pack* node_pack_node_append(Efl_Ui_Node *node);
+enum Efl_Ui_Node_Children_Type node_child_type_get(Efl_Ui_Node *node);
+enum Efl_Ui_Node_Children_Type node_child_fetch_usage(Eolian_State *state, const char *klass);
+
+
+void efl_ui_node_free(Efl_Ui_Node *node); //Be carefull does not cleanup in the parent
