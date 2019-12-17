@@ -134,6 +134,34 @@ dump_h_file(Eina_Strbuf *typedef_fields, const char *name, Eina_Strbuf *type)
    c_header_content = eina_strbuf_release(buf);
 }
 
+void
+_cgen_transform_value_cb(const Eolian_Type *etype, Eina_Strbuf *buf, const char *value)
+{
+   const Eolian_Type_Type type = eolian_type_type_get(etype);
+   EINA_SAFETY_ON_FALSE_RETURN(type == EOLIAN_TYPE_REGULAR);
+   const Eolian_Typedecl *decl = eolian_type_typedecl_get(etype);
+
+   if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
+     {
+        const Eolian_Enum_Type_Field *field = eolian_typedecl_enum_field_get(decl, value);
+        EINA_SAFETY_ON_NULL_RETURN(field);
+
+        eina_strbuf_append_printf(buf, "%s", eolian_typedecl_enum_field_c_constant_get(field));
+     }
+   else
+     {
+         const Eolian_Type_Builtin_Type bt = eolian_type_builtin_type_get(etype);
+
+         if (bt == EOLIAN_TYPE_BUILTIN_BOOL)
+           {
+              if (eina_streq(value, "true"))
+                eina_strbuf_append(buf, "EINA_TRUE");
+              else
+                eina_strbuf_append(buf, "EINA_FALSE");
+           }
+     }
+}
+
 Eina_Bool
 c_output(Eolian_State *s, Efl_Ui *ui)
 {
@@ -148,7 +176,7 @@ c_output(Eolian_State *s, Efl_Ui *ui)
 
    eina_strbuf_append(typedef_fields, "typedef struct {\n");
 
-   start = outputter_node_init(s, ui, &full_case_name);
+   start = outputter_node_init(s, ui, &full_case_name, _cgen_transform_value_cb);
    name = eina_strdup(full_case_name);
    eina_str_tolower(&name);
    eina_strbuf_append(type, full_case_name);

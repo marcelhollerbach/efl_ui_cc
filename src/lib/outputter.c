@@ -3,6 +3,7 @@
 #include "abstract_tree_private.h"
 
 struct _Outputter_Node {
+   void (*value_transform)(const Eolian_Type *etype, Eina_Strbuf *buf, const char *value);
    const Eolian_Class *klass;
    Eolian_State *s;
    Efl_Ui_Node *node;
@@ -47,48 +48,6 @@ create_outputter_node(Eolian_State *s, Efl_Ui_Node *content)
    return node;
 }
 
-static const char*
-_fetch_real_value(Eolian_Function_Parameter *parameter, const char *code_value)
-{
-   const Eolian_Type *etype = eolian_parameter_type_get(parameter);
-   const Eolian_Type_Type type = eolian_type_type_get(etype);
-
-   if (type == EOLIAN_TYPE_REGULAR)
-     {
-        const Eolian_Typedecl *decl = eolian_type_typedecl_get(etype);
-        if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
-          {
-             Eina_Iterator *iter = eolian_typedecl_enum_fields_get(decl);
-             Eolian_Enum_Type_Field *v;
-
-             EINA_ITERATOR_FOREACH(iter, v)
-               {
-                  const char *possible_value = eolian_typedecl_enum_field_name_get(v);
-
-                  if (eina_streq(code_value, possible_value))
-                    {
-                       eina_iterator_free(iter);
-                       return eina_strdup(eolian_typedecl_enum_field_c_constant_get(v));
-                    }
-               }
-             //nothing can happen here, validator would have catched anything weird here
-          }
-        else
-          {
-             Eolian_Type_Builtin_Type builtin = eolian_type_builtin_type_get(etype);
-             if (builtin == EOLIAN_TYPE_BUILTIN_BOOL)
-               {
-                  if (eina_streq(code_value, "true"))
-                    return eina_strdup("EINA_TRUE");
-                  else if (eina_streq(code_value, "false"))
-                    return eina_strdup("EINA_FALSE");
-               }
-          }
-     }
-   return eina_strdup(code_value);
-
-}
-
 static void
 _outputter_properties_values_fill(Outputter_Node *node, Inner_Outputter_Property *iprop, Efl_Ui_Property *prop, Eina_Iterator *parameters)
 {
@@ -108,12 +67,18 @@ _outputter_properties_values_fill(Outputter_Node *node, Inner_Outputter_Property
           {
              value->value.simple = EINA_FALSE;
              value->value.object = create_outputter_node(node->s, val->node);
+             value->value.object->value_transform = node->value_transform;
           }
         else
           {
+             Eina_Strbuf *buf = eina_strbuf_new();
              value->value.simple = EINA_TRUE;
-             value->value.real_value = val->value;
-             value->value.value = _fetch_real_value(parameter, val->value);
+
+             //value->value.value = _fetch_real_value(parameter, val->value);
+             node->value_transform(value->value.type, buf, val->value);
+             if (eina_strbuf_length_get(buf) == 0)
+               eina_strbuf_append(buf, val->value);
+             value->value.value = eina_strbuf_release(buf);
           }
         eina_array_push(iprop->values, value);
         i ++;
@@ -160,6 +125,7 @@ outputter_children_get(Outputter_Node *node)
             Efl_Ui_Pack_Linear *linear = c;
 
             ochild->child = create_outputter_node(node->s,linear->node);
+            ochild->child->value_transform = node->value_transform;
           }
         else if (node->node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE)
           {
@@ -169,12 +135,14 @@ outputter_children_get(Outputter_Node *node)
              ochild->table.w = atoi(table->w);
              ochild->table.h = atoi(table->h);
              ochild->child = create_outputter_node(node->s, table->node);
+             ochild->child->value_transform = node->value_transform;
           }
         else if (node->node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK)
           {
              Efl_Ui_Pack_Pack *pack = c;
              ochild->pack.pack = pack->part_name;
              ochild->child = create_outputter_node(node->s, pack->node);
+             ochild->child->value_transform = node->value_transform;
           }
 
         eina_array_push(node->children, ochild);
@@ -190,14 +158,14 @@ outputter_node_type_get(Outputter_Node *node)
 }
 
 Outputter_Node*
-outputter_node_init(Eolian_State *s, Efl_Ui* ui, const char **name)
+outputter_node_init(Eolian_State *s, Efl_Ui* ui, const char **name, void (*value_transform)(const Eolian_Type *etype, Eina_Strbuf *buf, const char *value))
 {
    Outputter_Node *n;
 
    EINA_SAFETY_ON_NULL_RETURN_VAL(s, NULL);
 
    n = create_outputter_node(s, ui->content);
-
+   n->value_transform = value_transform;
    n->s = s;
    *name = ui->name;
 

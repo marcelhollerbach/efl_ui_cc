@@ -101,7 +101,7 @@ _fill_property_values(Efl_Ui_Group_Item *item, Outputter_Property *property)
         eina_strbuf_append(displayed_value, value->argument);
         eina_strbuf_append(displayed_value, " : ");
         if (value->simple)
-          eina_strbuf_append(displayed_value, value->real_value);
+          eina_strbuf_append_printf(displayed_value, "\"%s\"", value->value);
         else
           eina_strbuf_append(displayed_value, "Object");
 
@@ -356,10 +356,23 @@ push_ui_node(Outputter_Node *node, Eina_Bool back_support)
 }
 
 void
+_base_ui_transform_value_cb(const Eolian_Type *etype, Eina_Strbuf *buf, const char *value)
+{
+   const Eolian_Type_Type type = eolian_type_type_get(etype);
+   EINA_SAFETY_ON_FALSE_RETURN(type == EOLIAN_TYPE_REGULAR);
+   const Eolian_Type_Builtin_Type bt = eolian_type_builtin_type_get(etype);
+
+   if (bt == EOLIAN_TYPE_BUILTIN_STRING || bt == EOLIAN_TYPE_BUILTIN_STRINGSHARE || bt == EOLIAN_TYPE_BUILTIN_MSTRING)
+      {
+         eina_strbuf_append_n(buf, value+1, strlen(value+1) - 1);
+      }
+}
+
+void
 base_ui_refresh(Efl_Ui *ui)
 {
    const char *name;
-   Outputter_Node *oroot = outputter_node_init(editor_state, ui, &name);
+   Outputter_Node *oroot = outputter_node_init(editor_state, ui, &name, _base_ui_transform_value_cb);
    efl_text_set(base_ui->ui_name, name);
 
    if (!root && !highest)

@@ -82,7 +82,7 @@ select_avaible_value(Outputter_Property_Value *value, Eo *anchor_widget)
         selection->set = data->ok;
         selection->selector = data->boolean_selector;
         selection->get_value = _fetch_bool_cb;
-        efl_ui_radio_group_selected_value_set(data->boolean_selector, eina_streq(value->real_value, "true"));
+        efl_ui_radio_group_selected_value_set(data->boolean_selector, eina_streq(value->value, "true"));
      }
    else
      {

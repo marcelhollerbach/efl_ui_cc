@@ -57,7 +57,7 @@ _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
                eina_strbuf_append(current_object, ", ");
              if (value->simple)
                {
-                  eina_strbuf_append(current_object, value->real_value);
+                  eina_strbuf_append(current_object, value->value);
                }
              else
                {
@@ -108,6 +108,11 @@ _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
    return current_object;
 }
 
+void
+_json_gen_transform_value_cb(const Eolian_Type *etype, Eina_Strbuf *buf, const char *value)
+{
+}
+
 char*
 json_output(const Eolian_State *s, const Efl_Ui *ui)
 {
@@ -118,7 +123,7 @@ json_output(const Eolian_State *s, const Efl_Ui *ui)
    char *json_output;
    char *name;
 
-   start = outputter_node_init((Eolian_State*)s, (Efl_Ui*)ui, &full_case_name);
+   start = outputter_node_init((Eolian_State*)s, (Efl_Ui*)ui, &full_case_name, _json_gen_transform_value_cb);
    Eina_Strbuf *main_func = _output_node(&ctx, start, NULL);
 
    name = eina_strdup(full_case_name);

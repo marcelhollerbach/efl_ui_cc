@@ -20,7 +20,6 @@ typedef struct {
     Outputter_Node *object;
     const char *value;
   };
-  const char *real_value;
   const char *argument;
 } Outputter_Property_Value;
 
@@ -58,7 +57,7 @@ Eina_Iterator *outputter_properties_get(Outputter_Node *node);
 Eina_Iterator *outputter_children_get(Outputter_Node *node);
 const Eolian_Class* outputter_node_klass_get(Outputter_Node *node);
 const char* outputter_node_id_get(Outputter_Node *node);
-Outputter_Node* outputter_node_init(Eolian_State *s, Efl_Ui* ui, const char **name);
+Outputter_Node* outputter_node_init(Eolian_State *s, Efl_Ui* ui, const char **name, void (*value_transform)(const Eolian_Type *etype, Eina_Strbuf *buf, const char *value));
 void outputter_node_root_free(Outputter_Node* node);
 enum Efl_Ui_Node_Children_Type outputter_node_type_get(Outputter_Node *node);
 

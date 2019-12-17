@@ -160,7 +160,7 @@ _call_property(Object_Generator_Context *ctx, Eo *obj, Outputter_Property *prope
              if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
                {
                   //asserting that enums are getting passed arround as an int
-                  const Eolian_Enum_Type_Field *field = eolian_typedecl_enum_field_get(decl, value->real_value);
+                  const Eolian_Enum_Type_Field *field = eolian_typedecl_enum_field_get(decl, value->value);
                   if (!field)
                     {
                        printf("Error, unable to fetch ptr for %s\n", value->value);
@@ -248,13 +248,26 @@ _generate_node(Object_Generator_Context *ctx, Outputter_Node *n, Efl_Ui_Widget *
    return obj;
 }
 
+void
+_obj_gen_transform_value_cb(const Eolian_Type *etype, Eina_Strbuf *buf, const char *value)
+{
+   const Eolian_Type_Type type = eolian_type_type_get(etype);
+   EINA_SAFETY_ON_FALSE_RETURN(type == EOLIAN_TYPE_REGULAR);
+   const Eolian_Type_Builtin_Type bt = eolian_type_builtin_type_get(etype);
+
+   if (bt == EOLIAN_TYPE_BUILTIN_STRING || bt == EOLIAN_TYPE_BUILTIN_STRINGSHARE || bt == EOLIAN_TYPE_BUILTIN_MSTRING)
+      {
+         eina_strbuf_append_n(buf, value+1, strlen(value+1) - 1);
+      }
+}
+
 Efl_Ui_Widget*
 object_generator(Efl_Ui_Win *win, const Eolian_State *s, const Efl_Ui *ui)
 {
    Object_Generator_Context ctx;
    const char *name;
 
-   Outputter_Node *root = outputter_node_init((Eolian_State*)s, (Efl_Ui*)ui, &name);
+   Outputter_Node *root = outputter_node_init((Eolian_State*)s, (Efl_Ui*)ui, &name, _obj_gen_transform_value_cb);
    Eo *ret = _generate_node(&ctx, root, win);
    outputter_node_root_free(root);
    return ret;
