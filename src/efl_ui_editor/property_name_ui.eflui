@@ -1,0 +1,21 @@
+{
+  "ui-name" : "Property_Name_Ui",
+  "ui-content" : {
+    "type": "Efl.Ui.Popup",
+    "id" : "root",
+    "content" : {
+      "type" : "Efl.Ui.Box",
+      "pack-linear" : [
+        {
+          "type" : "Efl.Ui.Textbox",
+          "editable" : false,
+          "text" : "Select a new Property:"
+        },
+        {
+          "type" : "Efl.Ui.List",
+          "id" : "list"
+        }
+      ]
+    }
+  }
+}

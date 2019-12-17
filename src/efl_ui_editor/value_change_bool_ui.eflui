@@ -1,0 +1,38 @@
+{
+  "ui-name" : "Value_Change_Bool_Ui",
+  "ui-content" : {
+    "type": "Efl.Ui.Popup",
+    "id" : "root",
+    "content" : {
+      "type" : "Efl.Ui.Box",
+      "pack-linear" : [
+        {
+          "type" : "Efl.Ui.Textbox",
+          "editable" : false,
+          "text" : "Select a new boolean state:"
+        },
+        {
+          "type" : "Efl.Ui.Radio_Box",
+          "id" : "boolean_selector",
+          "pack-linear" : [
+              {
+                "type" : "Efl.Ui.Radio",
+                "text" : "false",
+                "state_value" : 0
+              },
+              {
+                "type" : "Efl.Ui.Radio",
+                "text" : "true",
+                "state_value" : 1
+              },
+          ]
+        },
+        {
+           "type" : "Efl.Ui.Button",
+           "text" : "Set",
+           "id" : "ok"
+        },
+      ]
+    }
+  }
+}

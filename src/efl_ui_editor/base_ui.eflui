@@ -1,0 +1,45 @@
+{
+  "ui-name" : "Base_Ui",
+  "ui-content" : {
+    "type": "Efl.Ui.Panes",
+    "id" : "root",
+    "split_ratio" : 0.2,
+    "orientation" : vertical,
+    "pack-part" : [
+       {
+          "type" : "Efl.Ui.Stack",
+          "id" : "prop_stack",
+          "part" : "first",
+       },
+       {
+          "type" : "Efl.Ui.Table",
+          "part" : "second",
+          "pack-table" : [
+              {
+                 "type" : "Efl.Ui.Textbox",
+                 "editable" : false,
+                 "hint_weight" : [0.0, 0.0],
+                 "text" : "UI Name: ",
+                 "x" : 0,
+                 "y" : 0
+              },
+              {
+                 "type" : "Efl.Ui.Textbox",
+                 "id" : "ui_name",
+                 "hint_weight" : [0.0, 0.0],
+                 "x" : 1,
+                 "y" : 0
+              },
+              {
+                 "type" : "Efl.Canvas.Rectangle",
+                 "id" : "background",
+                 "x" : 0,
+                 "y" : 1,
+                 "w" : 2,
+                 "h" : 2
+              }
+          ]
+       }
+    ]
+   },
+}

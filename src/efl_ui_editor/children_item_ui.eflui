@@ -1,0 +1,19 @@
+{
+  "ui-name" : "Children_List_Item",
+  "ui-content" : {
+    "type": "Efl.Ui.List_Default_Item",
+    "id" : "root",
+    "pack-part" : [
+        {
+          "type" : "Efl.Ui.Button",
+          "id" : "delete",
+          "part" : "icon",
+          "content" : {
+              "type" : "Efl.Ui.Image",
+              "icon" : "edit-delete",
+
+          }
+        }
+     ]
+   },
+}

@@ -57,7 +57,7 @@ _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
                eina_strbuf_append(current_object, ", ");
              if (value->simple)
                {
-                  eina_strbuf_append(current_object, value->value);
+                  eina_strbuf_append(current_object, value->real_value);
                }
              else
                {

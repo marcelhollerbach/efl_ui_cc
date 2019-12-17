@@ -1,0 +1,28 @@
+{
+  "ui-name" : "Value_Change_Text_Ui",
+  "ui-content" : {
+    "type": "Efl.Ui.Popup",
+    "id" : "root",
+    "content" : {
+      "type" : "Efl.Ui.Box",
+      "pack-linear" : [
+        {
+          "type" : "Efl.Ui.Textbox",
+          "editable" : false,
+          "multiline" : false,
+          "text" : "Select a new Range:"
+        },
+        {
+          "type" : "Efl.Ui.Textbox",
+          "multiline" : false,
+          "id" : "text_selector",
+        },
+        {
+           "type" : "Efl.Ui.Button",
+           "text" : "Set",
+           "id" : "ok"
+        }
+      ]
+    }
+  }
+}
