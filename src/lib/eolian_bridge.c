@@ -97,16 +97,18 @@ find_all_widgets(Eolian_State *state)
 {
    Eina_Array *result;
    Eina_Iterator *it;
-   const Eolian_Class *widget;
+   const Eolian_Class *widget, *win;
    Eolian_Class *klass;
 
    widget = eolian_state_class_by_name_get(state, "Efl.Ui.Widget");
+   win = eolian_state_class_by_name_get(state, "Efl.Ui.Win");
    EINA_SAFETY_ON_NULL_RETURN_VAL(widget, NULL);
    result = eina_array_new(10);
    it = eolian_state_classes_get(state);
 
    EINA_ITERATOR_FOREACH(it, klass)
      {
+        if (eolian_class_isa(klass, win)) continue;
         if (eolian_class_type_get(klass) == EOLIAN_CLASS_REGULAR &&
             eolian_class_isa(klass, widget) &&
             is_allowed(EOLIAN_OBJECT(klass)))
