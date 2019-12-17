@@ -27,7 +27,71 @@ Efl_Gfx_Entity *background;
 
 static void push_ui_node(Outputter_Node *node, Eina_Bool back_support);
 
+static void
+_push_node_cb(void *data, const Efl_Event *ev)
+{
+   push_ui_node(data, EINA_TRUE);
+}
 
+static void
+_back_cb(void *data, const Efl_Event *ev)
+{
+   efl_ui_spotlight_pop(base_ui->prop_stack, EINA_TRUE);
+}
+
+#define UI_FEATURE(API_NAME, CONTROLLER_API_CALL, UI_GENERATOR_CALL, T) \
+static Eina_Value \
+API_NAME ##_delivery_cb(void *data, const Eina_Value value, const Eina_Future *f) \
+{ \
+   T *stack = data; \
+   if (eina_value_type_get(&value) != EINA_VALUE_TYPE_ERROR) \
+     { \
+         const char *name; \
+         EINA_SAFETY_ON_FALSE_RETURN_VAL(eina_value_string_get(&value, &name), eina_value_error_init(eina_error_find("Failed to find type"))); \
+         CONTROLLER_API_CALL; \
+     } \
+   return EINA_VALUE_EMPTY; \
+} \
+static void \
+API_NAME ##_cb (void *data, const Efl_Event *ev) \
+{ \
+   T *stack = data; \
+   Eina_Future *f = UI_GENERATOR_CALL; \
+   eina_future_then(f, API_NAME ##_delivery_cb, stack); \
+}
+
+//called when a new value is set to a parameter
+UI_FEATURE(_change_argument_value, change_parameter_type(outputter_property_value_value_get(stack), name), change_value(data, ev->object), void)
+
+//called when a new child is inserted
+UI_FEATURE(_add_new_child, add_child(stack->tnode, name), select_available_types(), Local_Stack)
+
+//a new property is added to the object
+UI_FEATURE(_add_new_property, add_property(stack->tnode, name), select_available_properties(stack->tnode), Local_Stack)
+
+//selecting a new type
+UI_FEATURE(_change_node_type, change_type(stack->tnode,  name), select_available_types(), Local_Stack)
+
+//a new id/name is selected
+UI_FEATURE(_change_id, change_id(stack->tnode, name), change_name(stack->tnode, ev->object), Local_Stack)
+
+//a property is deleted
+static void
+_prop_delete_cb(void *data, const Efl_Event *ev)
+{
+   del_property(data, efl_key_data_get(ev->object, "__name"));
+}
+
+//a child is removed
+static void
+_delete_child_cb(void *data, const Efl_Event *ev)
+{
+   Efl_Ui_Node *node = outputter_node_get(efl_key_data_get(ev->object, "__child"));
+
+   del_child(data, node);
+}
+
+//called when some node is updated
 static void
 _local_stack_update(Outputter_Node *node, Efl_Ui_Node *n)
 {
@@ -42,46 +106,6 @@ _local_stack_update(Outputter_Node *node, Efl_Ui_Node *n)
             stack->onode_replacement = node;
             eina_array_push(update_stack, stack);
          }
-     }
-}
-static void
-_push_node_cb(void *data, const Efl_Event *ev)
-{
-   push_ui_node(data, EINA_TRUE);
-}
-
-static void
-_back_cb(void *data, const Efl_Event *ev)
-{
-   efl_ui_spotlight_pop(base_ui->prop_stack, EINA_TRUE);
-}
-
-static Eina_Value
-_new_value_cb(void *data, const Eina_Value value, const Eina_Future *f)
-{
-   if (eina_value_type_get(&value) != EINA_VALUE_TYPE_ERROR)
-     {
-         const char *name;
-         EINA_SAFETY_ON_FALSE_RETURN_VAL(eina_value_string_get(&value, &name), eina_value_error_init(eina_error_find("Failed to find type")));
-         change_parameter_type(data, name);
-     }
-   return EINA_VALUE_EMPTY;
-}
-
-static void
-_argument_selected_cb(void *data, const Efl_Event *ev)
-{
-   Outputter_Property_Value *value = data;
-
-   if (value->simple)
-     {
-        Eina_Future* new_value = select_avaible_value(value, ev->object);
-        Efl_Ui_Property_Value *v = outputter_property_value_value_get(value);
-        eina_future_then(new_value, _new_value_cb, v);
-     }
-   else
-     {
-        push_ui_node(value->object, EINA_TRUE);
      }
 }
 
@@ -107,7 +131,10 @@ _fill_property_values(Efl_Ui_Group_Item *item, Outputter_Property *property)
 
         o = efl_add(EFL_UI_LIST_DEFAULT_ITEM_CLASS, item);
         efl_text_set(o, eina_strbuf_string_get(displayed_value));
-        efl_event_callback_add(o, EFL_INPUT_EVENT_CLICKED, _argument_selected_cb, value);
+        if (value->simple)
+          efl_event_callback_add(o, EFL_INPUT_EVENT_CLICKED, _change_argument_value_cb, value);
+        else
+          efl_event_callback_add(o, EFL_INPUT_EVENT_CLICKED, _push_node_cb, value->object);
         efl_pack_end(item, o);
 
         eina_strbuf_reset(displayed_value);
@@ -119,33 +146,6 @@ _fill_property_values(Efl_Ui_Group_Item *item, Outputter_Property *property)
    eina_iterator_free(property->values);
 }
 
-static Eina_Value
-_add_new_property_cb(void *data, const Eina_Value value, const Eina_Future *f)
-{
-   Local_Stack *stack = data;
-  if (eina_value_type_get(&value) != EINA_VALUE_TYPE_ERROR)
-    {
-        const char *name;
-        EINA_SAFETY_ON_FALSE_RETURN_VAL(eina_value_string_get(&value, &name), eina_value_error_init(eina_error_find("Failed to find type")));
-        add_property(stack->tnode, name);
-    }
-  return EINA_VALUE_EMPTY;
-}
-
-static void
-_new_property_create_cb(void *data, const Efl_Event *ev)
-{
-   Local_Stack *stack = data;
-   Eina_Future *f = select_available_properties(stack->tnode);
-
-   eina_future_then(f, _add_new_property_cb, stack);
-}
-
-static void
-_prop_delete_cb(void *data, const Efl_Event *ev)
-{
-   del_property(data, efl_key_data_get(ev->object, "__name"));
-}
 
 static void
 properties_flush(Local_Stack *data)
@@ -171,40 +171,9 @@ properties_flush(Local_Stack *data)
    eina_iterator_free(properties);
    // new property item
    New_Entry_Item_Data *item_data = new_entry_item_gen(data->data->properties);
-   efl_event_callback_add(item_data->new, EFL_INPUT_EVENT_CLICKED, _new_property_create_cb, data);
+   efl_event_callback_add(item_data->new, EFL_INPUT_EVENT_CLICKED, _add_new_property_cb, data);
    efl_pack_end(data->data->properties, item_data->root);
    free(item_data);
-}
-
-static Eina_Value
-_add_new_child_cb(void *data, const Eina_Value value, const Eina_Future *f)
-{
-   Local_Stack *stack = data;
-  if (eina_value_type_get(&value) != EINA_VALUE_TYPE_ERROR)
-    {
-        const char *name;
-        EINA_SAFETY_ON_FALSE_RETURN_VAL(eina_value_string_get(&value, &name), eina_value_error_init(eina_error_find("Failed to find type")));
-        add_child(stack->tnode, name);
-    }
-  return EINA_VALUE_EMPTY;
-}
-
-static void
-_new_child_create_cb(void *data, const Efl_Event *ev)
-{
-   Local_Stack *stack = data;
-   Eina_Future *f = select_available_types();
-
-   eina_future_then(f, _add_new_child_cb, stack);
-}
-
-
-static void
-_delete_cb(void *data, const Efl_Event *ev)
-{
-   Efl_Ui_Node *node = outputter_node_get(efl_key_data_get(ev->object, "__child"));
-
-   del_child(data, node);
 }
 
 static void
@@ -252,7 +221,7 @@ children_flush(Local_Stack *data)
         efl_text_set(pd->root, eina_strbuf_string_get(text));
         efl_pack_end(data->data->children, pd->root);
         efl_event_callback_add(pd->root, EFL_INPUT_EVENT_CLICKED, _push_node_cb, child->child);
-        efl_event_callback_add(pd->delete, EFL_INPUT_EVENT_CLICKED, _delete_cb, data->tnode);
+        efl_event_callback_add(pd->delete, EFL_INPUT_EVENT_CLICKED, _delete_child_cb, data->tnode);
         efl_key_data_set(pd->delete, "__child", child->child);
         //FIXME delete
         eina_strbuf_reset(text);
@@ -262,35 +231,13 @@ children_flush(Local_Stack *data)
 
    // new property item
    New_Entry_Item_Data *new_item = new_entry_item_gen(data->data->properties);
-   efl_event_callback_add(new_item->new, EFL_INPUT_EVENT_CLICKED, _new_child_create_cb, data);
+   efl_event_callback_add(new_item->new, EFL_INPUT_EVENT_CLICKED, _add_new_child_cb, data);
    efl_pack_end(data->data->children, new_item->root);
 
    if (node_child_type_get(data->tnode) == EFL_UI_NODE_CHILDREN_TYPE_NOTHING)
      efl_ui_widget_disabled_set(new_item->new, EINA_TRUE);
 
    free(new_item);
-}
-
-static Eina_Value
-_selected_type_cb(void *data, const Eina_Value value, const Eina_Future *dead_future)
-{
-   Local_Stack *stack = data;
-   if (eina_value_type_get(&value) != EINA_VALUE_TYPE_ERROR)
-     {
-        const char *name;
-        EINA_SAFETY_ON_FALSE_RETURN_VAL(eina_value_string_get(&value, &name), eina_value_error_init(eina_error_find("Failed to find type")));
-        change_type(stack->tnode,  name);
-     }
-
-   return EINA_VALUE_EMPTY;
-}
-
-static void
-_type_clicked_cb(void *data, const Efl_Event *ev)
-{
-   Eina_Future *soon_value = select_available_types();
-
-   eina_future_then(soon_value, _selected_type_cb, data);
 }
 
 static void

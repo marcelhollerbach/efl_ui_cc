@@ -51,7 +51,7 @@ _set_clicked_cb(void *data, const Efl_Event *ev)
 }
 
 Eina_Future*
-select_avaible_value(Outputter_Property_Value *value, Eo *anchor_widget)
+change_value(Outputter_Property_Value *value, Eo *anchor_widget)
 {
    Value_Selection *selection = calloc(sizeof(Value_Selection), 1);
 
@@ -107,4 +107,35 @@ select_avaible_value(Outputter_Property_Value *value, Eo *anchor_widget)
    efl_gfx_entity_visible_set(selection->popup, EINA_TRUE);
 
    return eina_future_new(selection->ctx);
+}
+
+static void
+_name_setting_cb(void *data, const Efl_Event *ev)
+{
+   Value_Selection *s = data;
+   const char *text;
+
+   text = efl_text_get(s->selector);
+   eina_promise_resolve(s->ctx, eina_value_string_init(text));
+   efl_del(s->popup);
+   free(s);
+}
+
+Eina_Future*
+change_name(Efl_Ui_Node *node, Eo *anchor_widget)
+{
+   Value_Selection *s = calloc(1, sizeof(Value_Selection));
+   Value_Change_Text_Ui_Data *data = value_change_text_ui_gen(win);
+   const char *id = node_id_get(node);
+   s->ctx = efl_loop_promise_new(efl_main_loop_get());
+   s->selector = data->text_selector;
+
+   efl_ui_popup_anchor_set(data->root, anchor_widget);
+   efl_event_callback_add(data->ok, EFL_INPUT_EVENT_CLICKED, _name_setting_cb, s);
+   efl_gfx_entity_visible_set(data->root, EINA_TRUE);
+   efl_text_set(s->selector, id);
+
+   s->popup = data->root;
+
+   return eina_future_new(s->ctx);
 }
