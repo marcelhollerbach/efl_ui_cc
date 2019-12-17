@@ -298,8 +298,8 @@ ui_node_flush(Local_Stack *data)
 {
    const Eolian_Class* klass = outputter_node_klass_get(data->onode);
 
-   efl_text_set(data->data->title, outputter_node_id_get(data->onode));
-   efl_text_set(data->data->type, eolian_object_name_get((const Eolian_Object*)klass));
+   efl_text_set(data->data->id_text, outputter_node_id_get(data->onode));
+   efl_text_set(data->data->type_text, eolian_object_name_get((const Eolian_Object*)klass));
    properties_flush(data);
    children_flush(data);
 }
@@ -339,7 +339,8 @@ push_ui_node(Outputter_Node *node, Eina_Bool back_support)
 
    efl_event_callback_add(stack->data->back, EFL_INPUT_EVENT_CLICKED, _back_cb, NULL);
    //change of type
-   efl_event_callback_add(stack->data->type, EFL_INPUT_EVENT_CLICKED, _type_clicked_cb, stack);
+   efl_event_callback_add(stack->data->type, EFL_INPUT_EVENT_CLICKED, _change_node_type_cb, stack);
+   efl_event_callback_add(stack->data->id, EFL_INPUT_EVENT_CLICKED, _change_id_cb, stack);
    efl_event_callback_add(stack->data->root, EFL_EVENT_INVALIDATE, _invalidate_cb, stack);
    ui_node_flush(stack);
    efl_ui_spotlight_push(base_ui->prop_stack, stack->data->root);
