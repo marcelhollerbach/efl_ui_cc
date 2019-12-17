@@ -14,7 +14,7 @@
           "w" : 2,
         },
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "text" : "Permissions:",
           "x" : 0,
@@ -23,7 +23,7 @@
           "w" : 1,
         },
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "id" : "permissions",
           "text" : "----",
@@ -33,7 +33,7 @@
           "w" : 1,
         },
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "text" : "Change: ",
           "x" : 0,
@@ -42,7 +42,7 @@
           "w" : 1,
         },
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "id" : "change",
           "text" : "----",
@@ -52,7 +52,7 @@
           "w" : 1,
         },
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "text" : "Modify: ",
           "x" : 0,
@@ -61,7 +61,7 @@
           "w" : 1,
         },
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "id" : "modify",
           "text" : "----",
@@ -71,7 +71,7 @@
           "w" : 1,
         },
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "text" : "Access: ",
           "x" : 0,
@@ -80,7 +80,7 @@
           "w" : 1,
         },
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "id" : "access",
           "text" : "----",
@@ -90,7 +90,7 @@
           "w" : 1,
         },
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "text" : "Owner: ",
           "x" : 0,
@@ -99,7 +99,7 @@
           "w" : 1,
         },
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "id" : "owner",
           "text" : "----",
@@ -109,7 +109,7 @@
           "w" : 1,
         },
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "text" : "Group: ",
           "x" : 0,
@@ -118,7 +118,7 @@
           "w" : 1,
         }
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "id" : "group",
           "text" : "----",
@@ -128,7 +128,7 @@
           "w" : 1,
         },
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "text" : "Size: ",
           "x" : 0,
@@ -137,7 +137,7 @@
           "w" : 1,
         }
         {
-          "type" : "Efl.Ui.Text",
+          "type" : "Efl.Ui.Textbox",
           "editable" : false,
           "id" : "size",
           "text" : "----",
