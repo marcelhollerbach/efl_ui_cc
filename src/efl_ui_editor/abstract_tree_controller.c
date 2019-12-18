@@ -136,7 +136,7 @@ void
 add_property(Efl_Ui_Node *node, const char *prop_name)
 {
    Efl_Ui_Property *property;
-   const Predicted_Property_Details *details;
+   Predicted_Property_Details *details;
 
    property = node_property_append(node);
    property_key_set(property, prop_name);
@@ -181,6 +181,7 @@ add_property(Efl_Ui_Node *node, const char *prop_name)
              property_value_value(value, eolian_typedecl_enum_field_name_get(field));
           }
      }
+   free(details);
    EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
    propagate_tree_change();
 }

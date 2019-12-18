@@ -83,7 +83,10 @@ eolian_class_isa(const Eolian_Class *a, const Eolian_Class *b)
         EINA_ITERATOR_FOREACH(iter, c)
           {
              if (eolian_class_isa(c, b))
-               return EINA_TRUE;
+               {
+                  eina_iterator_free(iter);
+                  return EINA_TRUE;
+               }
           }
         eina_iterator_free(iter);
 

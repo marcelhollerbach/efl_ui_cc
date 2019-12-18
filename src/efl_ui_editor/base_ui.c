@@ -223,7 +223,6 @@ children_flush(Local_Stack *data)
         efl_event_callback_add(pd->root, EFL_INPUT_EVENT_CLICKED, _push_node_cb, child->child);
         efl_event_callback_add(pd->delete, EFL_INPUT_EVENT_CLICKED, _delete_child_cb, data->tnode);
         efl_key_data_set(pd->delete, "__child", child->child);
-        //FIXME delete
         eina_strbuf_reset(text);
      }
    eina_strbuf_free(text);

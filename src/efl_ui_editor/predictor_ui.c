@@ -47,7 +47,6 @@ select_available_types(void)
 
         popup = efl_add(EFL_UI_POPUP_CLASS, efl_provider_find(win, EFL_UI_WIN_CLASS));
         efl_event_callback_add(popup, EFL_UI_POPUP_EVENT_BACKWALL_CLICKED, _types_hide_cb, NULL);
-
         container = efl_add(EFL_UI_LIST_CLASS, popup);
         efl_gfx_hint_size_min_set(container, EINA_SIZE2D(250, 250));
         efl_content_set(popup, container);
