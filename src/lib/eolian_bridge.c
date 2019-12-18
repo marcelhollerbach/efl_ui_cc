@@ -4,6 +4,7 @@
 #include <Eolian_Aux.h>
 
 static Eina_Bool _beta_allowed = EINA_FALSE;
+static Eina_Hash *klass_hash = NULL;
 
 void
 eolian_bridge_beta_allowed_set(Eina_Bool beta_allowed)
@@ -24,8 +25,16 @@ is_allowed(const Eolian_Object *obj)
 const Eolian_Class*
 find_klass(Eolian_State *s, const char *klass)
 {
-   Eina_Strbuf *buf = eina_strbuf_new();
+   Eina_Strbuf *buf;
+   const Eolian_Class *k;
 
+   if (!klass_hash)
+     klass_hash = eina_hash_string_small_new(NULL);
+
+   k = eina_hash_find(klass_hash, &klass);
+   if (k) return k;
+
+   buf = eina_strbuf_new();
    eina_strbuf_append(buf, klass);
    eina_strbuf_tolower(buf);
    eina_strbuf_replace_all(buf, ".", "_");
@@ -38,7 +47,9 @@ find_klass(Eolian_State *s, const char *klass)
      }
    eina_strbuf_free(buf);
 
-   return eolian_state_class_by_name_get(s, klass);
+   k = eolian_state_class_by_name_get(s, klass);
+   eina_hash_add(klass_hash, &klass, k);
+   return k;
 }
 
 const Eolian_Function*
