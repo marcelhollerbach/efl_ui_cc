@@ -9,7 +9,7 @@
         {
           "type" : "Efl.Ui.Textbox",
           "editable" : false,
-          "text" : "Select a new boolean state:"
+          "text" : "Change boolean state:"
         },
         {
           "type" : "Efl.Ui.Radio_Box",

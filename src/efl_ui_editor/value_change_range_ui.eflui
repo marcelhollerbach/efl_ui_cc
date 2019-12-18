@@ -9,7 +9,7 @@
         {
           "type" : "Efl.Ui.Textbox",
           "editable" : false,
-          "text" : "Select a new Range:"
+          "text" : "Change the range:"
         },
         {
           "type" : "Efl.Ui.Spin_Button",
