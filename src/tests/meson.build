@@ -1,4 +1,4 @@
-tests = ['testcase1', 'testcase2', 'testcase3', 'testcase4', 'testcase5', 'testcase6', 'testcase7']
+tests = ['testcase1', 'testcase2', 'testcase3', 'testcase4', 'testcase5', 'testcase6', 'testcase7', 'testcase8']
 
 env = environment()
 env.set('TEST_IN_TREE', '1')
