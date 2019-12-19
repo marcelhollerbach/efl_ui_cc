@@ -12,31 +12,45 @@
           "part" : "first",
        },
        {
-          "type" : "Efl.Ui.Table",
+          "type" : "Efl.Ui.Box",
           "part" : "second",
-          "pack-table" : [
+          "pack-linear" : [
               {
-                 "type" : "Efl.Ui.Textbox",
-                 "editable" : false,
-                 "hint_weight" : [0.0, 0.0],
-                 "text" : "UI Name: ",
-                 "x" : 0,
-                 "y" : 0
-              },
-              {
-                 "type" : "Efl.Ui.Textbox",
-                 "id" : "ui_name",
-                 "hint_weight" : [0.0, 0.0],
-                 "x" : 1,
-                 "y" : 0
+                "type" : "Efl.Ui.Box",
+                "orientation" : horizontal,
+                "hint_weight" : [1.0, 0.1],
+                "pack-linear" : [
+                  {
+                    "type" : "Efl.Ui.Button",
+                    "id" : "save",
+                    "text" : "Save",
+                    "hint_weight" : [0.1, 1.0],
+                    "content" : {
+                      "type" : "Efl.Ui.Image",
+                      "icon" : "document-save"
+                    }
+                  },
+                  {
+                    "type" : "Efl.Ui.Button",
+                    "id" : "refresh",
+                    "text" : "Refresh",
+                    "hint_weight" : [0.1, 1.0],
+                    "content" : {
+                      "type" : "Efl.Ui.Image",
+                      "icon" : "document-send"
+                    }
+                  },
+                  {
+                     "type" : "Efl.Canvas.Rectangle",
+                     "color" : [0, 0, 0, 0],
+                     "hint_weight" : [1.0, 1.0],
+                  }
+                ]
               },
               {
                  "type" : "Efl.Canvas.Rectangle",
                  "id" : "background",
-                 "x" : 0,
-                 "y" : 1,
-                 "w" : 2,
-                 "h" : 2
+                 "hint_weight" : [1.0, 1.0],
               }
           ]
        }

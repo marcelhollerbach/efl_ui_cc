@@ -111,11 +111,11 @@ enum Efl_Ui_Node_Children_Type
 outputter_node_available_types_get(Outputter_Node *node)
 {
    enum Efl_Ui_Node_Children_Type type = 0;
-   if (node->node->children_part)
+   if (eina_array_count(node->node->children_part))
      type |= EFL_UI_NODE_CHILDREN_TYPE_PACK;
-   if (node->node->children_linear)
+   if (eina_array_count(node->node->children_linear))
      type |= EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR;
-   if (node->node->children_table)
+   if (eina_array_count(node->node->children_table))
      type |= EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE;
 
    return type;

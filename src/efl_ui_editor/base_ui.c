@@ -153,7 +153,6 @@ _fill_property_values(Efl_Ui_Group_Item *item, Outputter_Property *property)
    eina_iterator_free(property->values);
 }
 
-
 static void
 properties_flush(Local_Stack *data)
 {
@@ -345,7 +344,7 @@ base_ui_refresh(Efl_Ui *ui)
 {
    const char *name;
    Outputter_Node *oroot = outputter_node_init(editor_state, ui, &name, _base_ui_transform_value_cb);
-   efl_text_set(base_ui->ui_name, name);
+   //efl_text_set(base_ui->ui_name, name);
 
    if (!root && !highest)
      {
@@ -406,11 +405,19 @@ _win_gone_cb(void *data, const Efl_Event *ev)
    free(base_ui);
 }
 
+static void
+_save_cb(void *data, const Efl_Event *ev)
+{
+   safe_file();
+}
+
 void
 base_ui_init(Efl_Ui_Win *win)
 {
    base_ui = base_ui_gen(win);
    efl_content_set(win, base_ui->root);
+   efl_event_callback_add(base_ui->save, EFL_INPUT_EVENT_CLICKED, _save_cb, NULL);
+   efl_ui_widget_disabled_set(base_ui->refresh, EINA_TRUE);
    efl_event_callback_add(win, EFL_EVENT_INVALIDATE, _win_gone_cb, NULL);
    background = base_ui->background;
 }

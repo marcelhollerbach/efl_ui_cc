@@ -108,7 +108,7 @@ _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
      _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE, "pack-table", current_object);
    if (type & EFL_UI_NODE_CHILDREN_TYPE_PACK)
      _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK, "pack", current_object);
-   eina_strbuf_replace_all(current_object, "\n", "\n  ");
+   eina_strbuf_replace_all(current_object, "\n", "\n ");
    eina_strbuf_append(current_object, "}");
    return current_object;
 }
@@ -136,7 +136,7 @@ json_output(const Eolian_State *s, const Efl_Ui *ui)
    eina_strbuf_append_printf(type, "{\n");
    eina_strbuf_append_printf(type, "  \"ui-name\" : \"%s\"\n", full_case_name);
    eina_strbuf_append_printf(type, "  \"ui-content\" : ");
-   eina_strbuf_replace_all(main_func, "\n", "\n  ");
+   eina_strbuf_replace_all(main_func, "\n", "\n ");
    eina_strbuf_append_buffer(type, main_func);
    eina_strbuf_append(type, "\n}\n");
    json_output = eina_strdup(eina_strbuf_string_get(type));

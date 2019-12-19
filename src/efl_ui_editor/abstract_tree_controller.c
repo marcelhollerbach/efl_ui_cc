@@ -214,3 +214,21 @@ file_set(const char *file)
    eina_stringshare_replace(&path, file);
    load_content();
 }
+
+void
+safe_file(void)
+{
+   //just a hack because i dont trust it yet that much
+   Eina_Strbuf *new_file_name = eina_strbuf_new();
+
+   eina_strbuf_append(new_file_name, path);
+   eina_strbuf_append(new_file_name, ".new");
+
+   EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
+   char *json = json_output(editor_state, ui_tree);
+   EINA_SAFETY_ON_NULL_RETURN(json);
+
+   FILE *f = fopen(eina_strbuf_release(new_file_name), "w+");
+   fwrite(json, 1, strlen(json), f);
+   fclose(f);
+}
