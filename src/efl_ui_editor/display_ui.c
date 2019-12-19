@@ -8,7 +8,6 @@
 
 #include "abstract_node_ui.h"
 #include "property_item_ui.h"
-#include "new_entry_item_ui.h"
 
 static Efl_Gfx_Entity *sample = NULL;
 
