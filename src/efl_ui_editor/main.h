@@ -20,7 +20,7 @@ void display_ui_refresh(Efl_Ui *ui);
 
 //Controller APIs
 void change_type(Efl_Ui_Node *node, const char *new_type);
-void add_child(Efl_Ui_Node *node, const char *klass_name);
+void add_child(Efl_Ui_Node *node, const char *klass_name, enum Efl_Ui_Node_Children_Type type);
 void del_child(Efl_Ui_Node *node, Efl_Ui_Node *child);
 void add_property(Efl_Ui_Node *node, const char *property_name);
 void del_property(Efl_Ui_Node *node, const char *prop_name);

@@ -6,6 +6,34 @@
 typedef struct {
 } Json_Context;
 
+
+static Eina_Strbuf* _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild);
+
+static void
+_print_children(Json_Context *ctx, Outputter_Node *node, enum Efl_Ui_Node_Children_Type type, const char *key, Eina_Strbuf *current_object)
+{
+   Outputter_Child *child;
+   Eina_Iterator *children;
+
+   children = outputter_children_get(node, type);
+
+   eina_strbuf_append_printf(current_object, "  %s : [\n", key);
+   int i = 0;
+   EINA_ITERATOR_FOREACH(children, child)
+     {
+        Eina_Strbuf *buf = _output_node(ctx, child->child, child);
+        eina_strbuf_prepend(buf, "  ");
+        eina_strbuf_replace_all(buf, "\n", "\n  ");
+        if (i > 0)
+          eina_strbuf_append(current_object, ", \n");
+        eina_strbuf_append_buffer(current_object, buf);
+        eina_strbuf_free(buf);
+        i++;
+    }
+  eina_strbuf_append(current_object, "\n  ]\n");
+  eina_iterator_free(children);
+}
+
 static Eina_Strbuf*
 _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
 {
@@ -73,36 +101,13 @@ _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
    eina_iterator_free(properties);
 
    //handle children
-   Outputter_Child *child;
-   Eina_Iterator *children = outputter_children_get(n);
-
-
-   if (outputter_node_type_get(n) != EFL_UI_NODE_CHILDREN_TYPE_NOTHING)
-     {
-        const char *keys[] = {
-          "NOTHING",
-          "\"pack-linear\"",
-          "\"pack-table\"",
-          "\"pack-part\"",
-        };
-        eina_strbuf_append_printf(current_object, "  %s : [\n", keys[outputter_node_type_get(n)]);
-        int i = 0;
-        EINA_ITERATOR_FOREACH(children, child)
-          {
-             Eina_Strbuf *buf = _output_node(ctx, child->child, child);
-             eina_strbuf_prepend(buf, "  ");
-             eina_strbuf_replace_all(buf, "\n", "\n  ");
-
-             if (i > 0)
-               eina_strbuf_append(current_object, ", \n");
-             eina_strbuf_append_buffer(current_object, buf);
-             eina_strbuf_free(buf);
-             i++;
-         }
-       eina_strbuf_append(current_object, "\n  ]\n");
-       eina_iterator_free(children);
-     }
-
+   enum Efl_Ui_Node_Children_Type type = outputter_node_available_types_get(n);
+   if (type & EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR)
+     _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR, "pack-linear", current_object);
+   if (type & EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE)
+     _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE, "pack-table", current_object);
+   if (type & EFL_UI_NODE_CHILDREN_TYPE_PACK)
+     _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK, "pack", current_object);
    eina_strbuf_replace_all(current_object, "\n", "\n  ");
    eina_strbuf_append(current_object, "}");
    return current_object;

@@ -107,53 +107,84 @@ outputter_properties_get(Outputter_Node *node)
    return eina_array_iterator_new(node->properties);
 }
 
+enum Efl_Ui_Node_Children_Type
+outputter_node_available_types_get(Outputter_Node *node)
+{
+   enum Efl_Ui_Node_Children_Type type = 0;
+   if (node->node->children_part)
+     type |= EFL_UI_NODE_CHILDREN_TYPE_PACK;
+   if (node->node->children_linear)
+     type |= EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR;
+   if (node->node->children_table)
+     type |= EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE;
+
+   return type;
+}
+
 Eina_Iterator*
-outputter_children_get(Outputter_Node *node)
+outputter_children_get(Outputter_Node *node, enum Efl_Ui_Node_Children_Type preference)
 {
    Eina_Iterator *children;
    void *c;
 
    node->children = eina_array_new(10);
-   children = eina_array_iterator_new(node->node->children);
-   EINA_ITERATOR_FOREACH(children, c)
+   if (preference & EFL_UI_NODE_CHILDREN_TYPE_PACK)
      {
-        Outputter_Child *ochild = calloc(1, sizeof(Outputter_Child));
-        ochild->type = node->node->usage_type;
-        if (node->node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR)
+        children = eina_array_iterator_new(node->node->children_part);
+        EINA_ITERATOR_FOREACH(children, c)
           {
-            Efl_Ui_Pack_Linear *linear = c;
+             Outputter_Child *ochild = calloc(1, sizeof(Outputter_Child));
 
-            ochild->child = create_outputter_node(node->s,linear->node);
-            ochild->child->value_transform = node->value_transform;
-          }
-        else if (node->node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE)
+             Efl_Ui_Pack_Pack *pack = c;
+             ochild->pack.pack = pack->part_name;
+             ochild->type = EFL_UI_NODE_CHILDREN_TYPE_PACK;
+             ochild->child = create_outputter_node(node->s, pack->basic.node);
+             ochild->child->value_transform = node->value_transform;
+
+             eina_array_push(node->children, ochild);
+         }
+       eina_iterator_free(children);
+     }
+
+   if (preference & EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE)
+     {
+        children = eina_array_iterator_new(node->node->children_table);
+        EINA_ITERATOR_FOREACH(children, c)
           {
+             Outputter_Child *ochild = calloc(1, sizeof(Outputter_Child));
+
              Efl_Ui_Pack_Table *table = c;
+             ochild->type = EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE;
              ochild->table.x = atoi(table->x);
              ochild->table.y = atoi(table->y);
              ochild->table.w = atoi(table->w);
              ochild->table.h = atoi(table->h);
-             ochild->child = create_outputter_node(node->s, table->node);
+             ochild->child = create_outputter_node(node->s, table->basic.node);
              ochild->child->value_transform = node->value_transform;
-          }
-        else if (node->node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK)
-          {
-             Efl_Ui_Pack_Pack *pack = c;
-             ochild->pack.pack = pack->part_name;
-             ochild->child = create_outputter_node(node->s, pack->node);
-             ochild->child->value_transform = node->value_transform;
-          }
 
-        eina_array_push(node->children, ochild);
+             eina_array_push(node->children, ochild);
+         }
+       eina_iterator_free(children);
      }
-   eina_iterator_free(children);
-   return eina_array_iterator_new(node->children);
-}
 
-enum Efl_Ui_Node_Children_Type
-outputter_node_type_get(Outputter_Node *node)
-{
-   return node->node->usage_type;
+   if (preference & EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR)
+     {
+        children = eina_array_iterator_new(node->node->children_linear);
+        EINA_ITERATOR_FOREACH(children, c)
+          {
+             Outputter_Child *ochild = calloc(1, sizeof(Outputter_Child));
+
+             Efl_Ui_Pack_Linear *linear = c;
+             ochild->type = EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR;
+             ochild->child = create_outputter_node(node->s,linear->basic.node);
+             ochild->child->value_transform = node->value_transform;
+
+             eina_array_push(node->children, ochild);
+          }
+       eina_iterator_free(children);
+     }
+
+   return eina_array_iterator_new(node->children);
 }
 
 Outputter_Node*

@@ -1,5 +1,4 @@
 #include <main.h>
-#include <Efl_Ui_Format.h>
 #include <abstract_tree_private.h>
 #include "Internal.h"
 #include "predictor.h"
@@ -39,35 +38,33 @@ change_type(Efl_Ui_Node *node, const char *type)
     node->properties->count -= shifter;
 
     //FIXME remove children if needed
-    node->usage_type = fetch_usage(editor_state, type);
-
     EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
     propagate_tree_change();
 }
 
 void
-add_child(Efl_Ui_Node *node, const char *klass_name)
+add_child(Efl_Ui_Node *node, const char *klass_name, enum Efl_Ui_Node_Children_Type type)
 {
    Efl_Ui_Node *new_node;
    const Eolian_Class *klass = find_klass(editor_state, klass_name);
 
    EINA_SAFETY_ON_NULL_RETURN(klass);
 
-   switch(node_child_type_get(node))
+   switch(type)
      {
         case EFL_UI_NODE_CHILDREN_TYPE_PACK: {
           Efl_Ui_Pack_Pack *pack = node_pack_node_append(node);
-          new_node = pack->node;
+          new_node = pack->basic.node;
         }
         break;
         case EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR: {
           Efl_Ui_Pack_Linear *linear = node_pack_linear_node_append(node);
-          new_node = linear->node;
+          new_node = linear->basic.node;
         }
         break;
         case EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE: {
           Efl_Ui_Pack_Table *table = node_pack_table_node_append(node);
-          new_node = table->node;
+          new_node = table->basic.node;
         }
         break;
         default:
@@ -76,7 +73,6 @@ add_child(Efl_Ui_Node *node, const char *klass_name)
         break;
      }
    node_type_set(new_node, klass_name);
-   new_node->usage_type = fetch_usage(editor_state, klass_name);
    EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
    propagate_tree_change();
 }
@@ -84,52 +80,9 @@ add_child(Efl_Ui_Node *node, const char *klass_name)
 void
 del_child(Efl_Ui_Node *node, Efl_Ui_Node *child)
 {
-   int shifter = 0;
-   void *to_free1 = NULL, *to_free2 = NULL;
-   for (int i = 0; i < eina_array_count(node->children); ++i)
-     {
-        Efl_Ui_Node *n;
-        void *f;
-        switch(node->usage_type)
-          {
-             case EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR: {
-                Efl_Ui_Pack_Linear *linear = f = eina_array_data_get(node->children, i);
-                n = linear->node;
-             }
-             break;
-             case EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE: {
-                Efl_Ui_Pack_Table *table = f = eina_array_data_get(node->children, i);
-                n = table->node;
-             }
-             break;
-             case EFL_UI_NODE_CHILDREN_TYPE_PACK: {
-                Efl_Ui_Pack_Pack *pack = f = eina_array_data_get(node->children, i);
-                n = pack->node;
-             }
-             default: /*WAD*/
-             break;
-          }
-        if (n == child)
-          {
-             to_free1 = n;
-             to_free2 = f;
-             shifter ++;
-          }
-        if (shifter)
-          {
-             void *n = NULL;
-
-             if (i + shifter < eina_array_count(node->children))
-               n = eina_array_data_get(node->children, i + shifter);
-
-             eina_array_data_set(node->children, i, n);
-          }
-     }
-   node->children->count -= shifter;
+   node_child_remove(node, child);
    EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
    propagate_tree_change();
-   efl_ui_node_free(to_free1);
-   free(to_free2);
 }
 
 void
@@ -249,7 +202,6 @@ load_content(void)
         content = efl_ui_content_get(ui_tree);
         efl_ui_name_set(ui_tree, "<Insert Name Here>");
         node_type_set(content, "Efl.Ui.Button");
-        content->usage_type = EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR;
      }
    EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
    base_ui_refresh(ui_tree);

@@ -31,8 +31,9 @@ typedef struct {
 enum Efl_Ui_Node_Children_Type {
   EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR = 1,
   EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE = 2,
-  EFL_UI_NODE_CHILDREN_TYPE_PACK = 3,
+  EFL_UI_NODE_CHILDREN_TYPE_PACK = 4,
   EFL_UI_NODE_CHILDREN_TYPE_NOTHING = 0,
+  EFL_UI_NODE_CHILDREN_TYPE_ALL = 7,
 };
 
 typedef struct {
@@ -54,12 +55,12 @@ typedef struct {
 void eolian_bridge_beta_allowed_set(Eina_Bool beta_awareness);
 
 Eina_Iterator *outputter_properties_get(Outputter_Node *node);
-Eina_Iterator *outputter_children_get(Outputter_Node *node);
+Eina_Iterator *outputter_children_get(Outputter_Node *node, enum Efl_Ui_Node_Children_Type preference);
 const Eolian_Class* outputter_node_klass_get(Outputter_Node *node);
 const char* outputter_node_id_get(Outputter_Node *node);
 Outputter_Node* outputter_node_init(Eolian_State *s, Efl_Ui* ui, const char **name, void (*value_transform)(const Eolian_Type *etype, Eina_Strbuf *buf, const char *value));
 void outputter_node_root_free(Outputter_Node* node);
-enum Efl_Ui_Node_Children_Type outputter_node_type_get(Outputter_Node *node);
+enum Efl_Ui_Node_Children_Type outputter_node_available_types_get(Outputter_Node *node);
 
 Efl_Ui_Node *outputter_node_get(Outputter_Node *node);
 Efl_Ui_Property* outputter_property_property_get(Outputter_Property *prop);

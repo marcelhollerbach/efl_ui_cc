@@ -7,8 +7,9 @@ struct _Efl_Ui_Node {
    const char *id;   //Id of the name of this node
    const char *type; //String of the Eolian type
    Eina_Array *properties; //array of Node_Properties
-   enum Efl_Ui_Node_Children_Type usage_type;
-   Eina_Array *children;
+   Eina_Array *children_linear; //array of Efl_Ui_Pack_Linear
+   Eina_Array *children_table; //array of Efl_Ui_Pack_Table
+   Eina_Array *children_part; //array of Efl_Ui_Pack_Pack
 };
 
 struct _Efl_Ui_Property {
@@ -24,8 +25,12 @@ struct _Efl_Ui_Property_Value {
    };
 };
 
-struct _Efl_Ui_Pack_Table {
+struct _Efl_Ui_Pack_Basic {
    Efl_Ui_Node *node;
+};
+
+struct _Efl_Ui_Pack_Table {
+   Efl_Ui_Pack_Basic basic;
    const char *x;
    const char *y;
    const char *w;
@@ -33,11 +38,11 @@ struct _Efl_Ui_Pack_Table {
 };
 
 struct _Efl_Ui_Pack_Linear {
-   Efl_Ui_Node *node;
+   Efl_Ui_Pack_Basic basic;
 };
 
 struct _Efl_Ui_Pack_Pack {
-   Efl_Ui_Node *node;
+   Efl_Ui_Pack_Basic basic;
    const char *part_name;
 };
 

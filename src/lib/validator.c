@@ -181,42 +181,44 @@ validate_node(Validator_Context *ctx, Efl_Ui_Node *node)
    eina_iterator_free(it);
 
    //validate children
-
-   it = eina_array_iterator_new(node->children);
-
-   if (node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR)
+   if (eina_array_count(node->children_linear))
      {
         Efl_Ui_Pack_Linear *linear;
+        Eina_Iterator *it = eina_array_iterator_new(node->children_linear);
 
         EINA_ITERATOR_FOREACH(it, linear)
           {
-             if (!validate_node(ctx, linear->node))
+             if (!validate_node(ctx, linear->basic.node))
                {
                   eina_iterator_free(it);
                   return EINA_FALSE;
                }
           }
+        eina_iterator_free(it);
      }
-   else if (node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE)
+   if (eina_array_count(node->children_table))
      {
         Efl_Ui_Pack_Table *table;
+        Eina_Iterator *it = eina_array_iterator_new(node->children_table);
 
         EINA_ITERATOR_FOREACH(it, table)
           {
-             if (!validate_node(ctx, table->node))
+             if (!validate_node(ctx, table->basic.node))
                {
                   eina_iterator_free(it);
                   return EINA_FALSE;
                }
           }
+        eina_iterator_free(it);
      }
-   else if (node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK)
+   if (eina_array_count(node->children_part))
      {
         Efl_Ui_Pack_Pack *pack;
+        Eina_Iterator *it = eina_array_iterator_new(node->children_table);
 
         EINA_ITERATOR_FOREACH(it, pack)
           {
-             if (!validate_node(ctx, pack->node))
+             if (!validate_node(ctx, pack->basic.node))
                {
                   eina_iterator_free(it);
                   return EINA_FALSE;
@@ -228,17 +230,8 @@ validate_node(Validator_Context *ctx, Efl_Ui_Node *node)
                   return EINA_FALSE;
                }
           }
+        eina_iterator_free(it);
      }
-   else
-     {
-        if (eina_array_count(node->children))
-          {
-             printf("No children allowed here\n");
-             return EINA_FALSE;
-          }
-     }
-
-   eina_iterator_free(it);
    return EINA_TRUE;
 }
 

@@ -231,7 +231,7 @@ _generate_node(Object_Generator_Context *ctx, Outputter_Node *n, Efl_Ui_Widget *
 
    //handle children
    Outputter_Child *child;
-   Eina_Iterator *children = outputter_children_get(n);
+   Eina_Iterator *children = outputter_children_get(n, EFL_UI_NODE_CHILDREN_TYPE_ALL);
 
    EINA_ITERATOR_FOREACH(children, child)
      {

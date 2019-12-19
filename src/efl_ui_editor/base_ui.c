@@ -64,7 +64,7 @@ API_NAME ##_cb (void *data, const Efl_Event *ev) \
 UI_FEATURE(_change_argument_value, change_parameter_type(outputter_property_value_value_get(stack), name), change_value(data, ev->object), void)
 
 //called when a new child is inserted
-UI_FEATURE(_add_new_child, add_child(stack->tnode, name), select_available_types(), Local_Stack)
+UI_FEATURE(_add_new_child, add_child(stack->tnode, name, EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR), select_available_types(), Local_Stack)
 
 //a new property is added to the object
 UI_FEATURE(_add_new_property, add_property(stack->tnode, name), select_available_properties(stack->tnode), Local_Stack)
@@ -179,7 +179,7 @@ properties_flush(Local_Stack *data)
 static void
 children_flush(Local_Stack *data)
 {
-   Eina_Iterator *children = outputter_children_get(data->onode);
+   Eina_Iterator *children = outputter_children_get(data->onode, EFL_UI_NODE_CHILDREN_TYPE_ALL);
    Outputter_Child *child;
    Eina_Strbuf *text = eina_strbuf_new();
    int i = 0;
@@ -233,8 +233,7 @@ children_flush(Local_Stack *data)
    efl_event_callback_add(new_item->new, EFL_INPUT_EVENT_CLICKED, _add_new_child_cb, data);
    efl_pack_end(data->data->children, new_item->root);
 
-   if (node_child_type_get(data->tnode) == EFL_UI_NODE_CHILDREN_TYPE_NOTHING)
-     efl_ui_widget_disabled_set(new_item->new, EINA_TRUE);
+   //FIXME add a way for different children
 
    free(new_item);
 }

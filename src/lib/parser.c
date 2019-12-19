@@ -136,7 +136,7 @@ parse_pack_linear(Efl_Ui_Node *n, int return_pos)
           }
         next = node_pack_linear_node_append(n);
 
-        if (!parse_ui_element(next->node, last_pos, NULL, NULL))
+        if (!parse_ui_element(next->basic.node, last_pos, NULL, NULL))
           return EINA_FALSE;
 
         free(value);
@@ -194,7 +194,7 @@ parse_pack_table(Efl_Ui_Node *n, int return_pos)
         next = node_pack_table_node_append(n);
 
 
-        if (!parse_ui_element(next->node, last_pos, handler_context_table, next))
+        if (!parse_ui_element(next->basic.node, last_pos, handler_context_table, next))
           return EINA_FALSE;
 
         if (!next->w)
@@ -242,7 +242,7 @@ parse_part(Efl_Ui_Node *n, int return_pos)
           }
         next = node_pack_node_append(n);
 
-        if (!parse_ui_element(next->node, last_pos, handler_context_part, next))
+        if (!parse_ui_element(next->basic.node, last_pos, handler_context_part, next))
           return EINA_FALSE;
 
         free(value);

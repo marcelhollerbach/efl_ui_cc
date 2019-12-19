@@ -8,7 +8,9 @@ create_node(void)
    Efl_Ui_Node *node = calloc(1, sizeof(Efl_Ui_Node));
 
    node->properties = eina_array_new(10);
-   node->children = eina_array_new(10);
+   node->children_linear = eina_array_new(10);
+   node->children_table = eina_array_new(10);
+   node->children_part = eina_array_new(10);
    return node;
 }
 
@@ -78,10 +80,9 @@ node_pack_linear_node_append(Efl_Ui_Node *node)
 {
    Efl_Ui_Pack_Linear *inner_node;
 
-   node->usage_type = EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR;
    inner_node = calloc(1, sizeof(Efl_Ui_Pack_Linear));
-   inner_node->node = create_node();
-   eina_array_push(node->children, inner_node);
+   inner_node->basic.node = create_node();
+   eina_array_push(node->children_linear, inner_node);
    return inner_node;
 }
 
@@ -90,10 +91,9 @@ node_pack_table_node_append(Efl_Ui_Node *node)
 {
    Efl_Ui_Pack_Table *inner_node;
 
-   node->usage_type = EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE;
    inner_node = calloc(1, sizeof(Efl_Ui_Pack_Table));
-   inner_node->node = create_node();
-   eina_array_push(node->children, inner_node);
+   inner_node->basic.node = create_node();
+   eina_array_push(node->children_table, inner_node);
 
    return inner_node;
 }
@@ -102,11 +102,10 @@ Efl_Ui_Pack_Pack*
 node_pack_node_append(Efl_Ui_Node *node)
 {
    Efl_Ui_Pack_Pack *inner_node;
-   node->usage_type = EFL_UI_NODE_CHILDREN_TYPE_PACK;
 
    inner_node = calloc(1, sizeof(Efl_Ui_Pack_Table));
-   inner_node->node = create_node();
-   eina_array_push(node->children, inner_node);
+   inner_node->basic.node = create_node();
+   eina_array_push(node->children_part, inner_node);
 
    return inner_node;
 }
@@ -131,6 +130,27 @@ efl_ui_content_get(Efl_Ui *ui)
 {
    ui->content = create_node();
    return ui->content;
+}
+
+static Eina_Bool
+_deletion_cb(void *node1, void *remove)
+{
+   Efl_Ui_Pack_Basic *b = node1;
+   if (b->node == remove)
+     {
+        free(b);
+        return EINA_FALSE;
+     }
+   return EINA_TRUE;
+}
+
+void
+node_child_remove(Efl_Ui_Node *node, Efl_Ui_Node *child)
+{
+   eina_array_remove(node->children_linear, _deletion_cb, child);
+   eina_array_remove(node->children_table, _deletion_cb, child);
+   eina_array_remove(node->children_part, _deletion_cb, child);
+   free(child);
 }
 
 void
@@ -171,40 +191,39 @@ efl_ui_node_free(Efl_Ui_Node *node)
 
    //handle children
    {
-      while (eina_array_count(node->children))
+      while (eina_array_count(node->children_linear))
         {
-           if (node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR)
-             {
-                Efl_Ui_Pack_Linear *linear = eina_array_pop(node->children);
+           Efl_Ui_Pack_Linear *linear = eina_array_pop(node->children_linear);
 
-                efl_ui_node_free(linear->node);
-                free(linear);
-             }
-           else if (node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE)
-             {
-                Efl_Ui_Pack_Table *table = eina_array_pop(node->children);
-                if (table->x)
-                  free((char*)table->x);
-                if (table->y)
-                  free((char*)table->y);
-                if (table->w)
-                  free((char*)table->w);
-                if (table->h)
-                  free((char*)table->h);
-                efl_ui_node_free(table->node);
-                free(table);
-             }
-           else if (node->usage_type == EFL_UI_NODE_CHILDREN_TYPE_PACK)
-             {
-                Efl_Ui_Pack_Pack *pack = eina_array_pop(node->children);
-                if (pack->part_name)
-                  free((char*)pack->part_name);
-                efl_ui_node_free(pack->node);
-                free(pack);
-             }
-
+           efl_ui_node_free(linear->basic.node);
+           free(linear);
         }
-      eina_array_free(node->children);
+      eina_array_free(node->children_linear);
+
+      while (eina_array_count(node->children_table))
+        {
+           Efl_Ui_Pack_Table *table = eina_array_pop(node->children_table);
+           if (table->x)
+             free((char*)table->x);
+           if (table->y)
+             free((char*)table->y);
+           if (table->w)
+             free((char*)table->w);
+           if (table->h)
+             free((char*)table->h);
+           efl_ui_node_free(table->basic.node);
+           free(table);
+        }
+      eina_array_free(node->children_table);
+      while (eina_array_count(node->children_part))
+        {
+           Efl_Ui_Pack_Pack *pack = eina_array_pop(node->children_part);
+           if (pack->part_name)
+             free((char*)pack->part_name);
+           efl_ui_node_free(pack->basic.node);
+           free(pack);
+        }
+      eina_array_free(node->children_part);
    }
    if (node)
      free(node);
@@ -217,12 +236,6 @@ efl_ui_free(Efl_Ui *ui)
      free((char*)ui->name);
    efl_ui_node_free(ui->content);
    free(ui);
-}
-
-enum Efl_Ui_Node_Children_Type
-node_child_type_get(Efl_Ui_Node *node)
-{
-   return node->usage_type;
 }
 
 const char*
