@@ -29,4 +29,5 @@ executable('efl_ui_editor',
    'base_ui.c', 'display_ui.c', 'abstract_tree_controller.c',
    'predictor_ui.c', 'value_change_ui.c', gen_files],
   dependencies: [dependency('eolian'), dependency('efl-ui'), efl_ui_format, dependency('libffi'), dl],
+  install: true,
 )
