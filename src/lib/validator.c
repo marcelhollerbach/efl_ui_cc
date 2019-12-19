@@ -105,11 +105,7 @@ validate_property(Validator_Context *ctx, const Eolian_Class *klass, Efl_Ui_Prop
         Efl_Ui_Property_Value *value = eina_array_data_get(node->value, c);
         const Eolian_Typedecl *decl = eolian_type_typedecl_get(type);
 
-        while(eolian_typedecl_aliased_base_get(decl))
-          {
-             type = eolian_typedecl_aliased_base_get(decl);
-             decl = eolian_type_typedecl_get(type);
-          }
+        fetch_real_typedecl(&decl, &type);
 
         switch(eolian_type_type_get(type))
           {

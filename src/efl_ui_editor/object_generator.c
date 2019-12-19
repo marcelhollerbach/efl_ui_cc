@@ -162,7 +162,11 @@ _call_property(Object_Generator_Context *ctx, Eo *obj, Outputter_Property *prope
         if (value->simple)
           {
              const Eolian_Typedecl *decl = eolian_type_typedecl_get(type);
+
+             fetch_real_typedecl(&decl, &type);
+
              EINA_SAFETY_ON_FALSE_RETURN_VAL(ttype == EOLIAN_TYPE_REGULAR, EINA_FALSE);
+
              if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
                {
                   //asserting that enums are getting passed arround as an int
@@ -179,6 +183,10 @@ _call_property(Object_Generator_Context *ctx, Eo *obj, Outputter_Property *prope
 
                   types[value_count] = &ffi_type_uint32;
                   pointers[value_count] = (void*)(intptr_t)uvalue;
+               }
+             else if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_STRUCT)
+               {
+
                }
              else
                {

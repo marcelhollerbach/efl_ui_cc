@@ -217,3 +217,13 @@ fetch_usage(Eolian_State *state, const char *klass)
 
    return EFL_UI_NODE_CHILDREN_TYPE_NOTHING;
 }
+
+void
+fetch_real_typedecl(const Eolian_Typedecl **decl, const Eolian_Type **type)
+{
+        while(eolian_typedecl_aliased_base_get(*decl))
+          {
+             *type = eolian_typedecl_aliased_base_get(*decl);
+             *decl = eolian_type_typedecl_get(*type);
+          }
+}

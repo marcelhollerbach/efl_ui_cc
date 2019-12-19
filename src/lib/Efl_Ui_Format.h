@@ -70,4 +70,6 @@ Efl_Ui* efl_ui_new(void);
 void efl_ui_name_set(Efl_Ui *ui, const char *name);
 Efl_Ui_Node* efl_ui_content_get(Efl_Ui *ui);
 
+void fetch_real_typedecl(const Eolian_Typedecl **decl, const Eolian_Type **type);
+
 #endif
