@@ -9,8 +9,15 @@
 
 Eolian_State *editor_state = NULL;
 Eina_Bool beta_support = EINA_FALSE;
-
+Eina_Bool test_mode = EINA_FALSE;
 Efl_Ui_Win *win;
+
+static void
+_exit_cb(void *data, const Efl_Event *ev)
+{
+   if (getenv("TEST_IN_TREE"))
+     efl_loop_quit(efl_main_loop_get(), eina_value_int_init(0));
+}
 
 EAPI_MAIN void
 efl_main(void *data EINA_UNUSED, const Efl_Event *ev EINA_UNUSED)
@@ -28,6 +35,10 @@ efl_main(void *data EINA_UNUSED, const Efl_Event *ev EINA_UNUSED)
         if (!strcmp(argument, "--beta-support"))
           {
              beta_support = EINA_TRUE;
+          }
+        else if (!strcmp(argument, "--test-mode"))
+          {
+             test_mode = EINA_TRUE;
           }
         else if (!strcmp(argument, "-I"))
           {
@@ -88,6 +99,12 @@ efl_main(void *data EINA_UNUSED, const Efl_Event *ev EINA_UNUSED)
                  efl_ui_win_autodel_set(efl_added, EINA_TRUE)
                 );
    efl_ui_win_exit_on_close_set(win, eina_value_int_new(1));
+   if (test_mode)
+     {
+        eina_log_abort_on_critical_level_set(3);
+        eina_log_abort_on_critical_set(EINA_TRUE);
+        efl_event_callback_add(win, EFL_CANVAS_SCENE_EVENT_RENDER_POST, _exit_cb, NULL);
+     }
    predictor_init(editor_state);
    base_ui_init(win);
    display_ui_init(win);

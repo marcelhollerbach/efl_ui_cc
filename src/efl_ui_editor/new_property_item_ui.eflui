@@ -1,9 +1,9 @@
 {
-  "ui-name" : "New_Entry_Item",
+  "ui-name" : "New_Property_Item",
   "ui-content" : {
     "type": "Efl.Ui.List_Default_Item",
     "id" : "root",
-    "text" : "New Item",
+    "text" : "New Property",
     "pack-part" : [
         {
           "type" : "Efl.Ui.Button",

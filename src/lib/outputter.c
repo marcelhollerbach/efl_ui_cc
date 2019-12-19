@@ -263,3 +263,9 @@ outputter_property_value_value_get(Outputter_Property_Value *val)
 {
    return ((Inner_Outputter_Property_Value*)val)->pvalue;
 }
+
+enum Efl_Ui_Node_Children_Type
+outputter_node_possible_types_get(Outputter_Node *node)
+{
+   return fetch_usage(node->s, node->klass);
+}

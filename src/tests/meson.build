@@ -21,6 +21,12 @@ foreach test : tests
     is_parallel: true,
     timeout: 30,
   )
+  test(test+'_editor_run', editor,
+    env: env,
+    args : [ '--test-mode', join_paths(meson.current_source_dir(),test+'.eflui')],
+    is_parallel: true,
+    timeout: 30,
+  )
 endforeach
 
 predictor = executable('predictor',

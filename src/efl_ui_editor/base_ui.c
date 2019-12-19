@@ -6,7 +6,8 @@
 #include "base_ui.h"
 #include "abstract_node_ui.h"
 #include "property_item_ui.h"
-#include "new_entry_item_ui.h"
+#include "new_property_item_ui.h"
+#include "new_children_item_ui.h"
 #include "children_item_ui.h"
 
 typedef struct _Local_Stack Local_Stack;
@@ -63,8 +64,14 @@ API_NAME ##_cb (void *data, const Efl_Event *ev) \
 //called when a new value is set to a parameter
 UI_FEATURE(_change_argument_value, change_parameter_type(outputter_property_value_value_get(stack), name), change_value(data, ev->object), void)
 
-//called when a new child is inserted
-UI_FEATURE(_add_new_child, add_child(stack->tnode, name, EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR), select_available_types(), Local_Stack)
+//called when a new linear child is inserted
+UI_FEATURE(_add_new_child_linear, add_child(stack->tnode, name, EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR), select_available_types(), Local_Stack)
+
+//called when a new table child is inserted
+UI_FEATURE(_add_new_child_table, add_child(stack->tnode, name, EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE), select_available_types(), Local_Stack)
+
+//called when a new part child is inserted
+UI_FEATURE(_add_new_child_part, add_child(stack->tnode, name, EFL_UI_NODE_CHILDREN_TYPE_PACK), select_available_types(), Local_Stack)
 
 //a new property is added to the object
 UI_FEATURE(_add_new_property, add_property(stack->tnode, name), select_available_properties(stack->tnode), Local_Stack)
@@ -86,9 +93,9 @@ _prop_delete_cb(void *data, const Efl_Event *ev)
 static void
 _delete_child_cb(void *data, const Efl_Event *ev)
 {
-   Efl_Ui_Node *node = outputter_node_get(efl_key_data_get(ev->object, "__child"));
+   Efl_Ui_Node *child = outputter_node_get(efl_key_data_get(ev->object, "__child"));
 
-   del_child(data, node);
+   del_child(data, child);
 }
 
 //called when some node is updated
@@ -170,7 +177,7 @@ properties_flush(Local_Stack *data)
      }
    eina_iterator_free(properties);
    // new property item
-   New_Entry_Item_Data *item_data = new_entry_item_gen(data->data->properties);
+   New_Property_Item_Data *item_data = new_property_item_gen(data->data->properties);
    efl_event_callback_add(item_data->new, EFL_INPUT_EVENT_CLICKED, _add_new_property_cb, data);
    efl_pack_end(data->data->properties, item_data->root);
    free(item_data);
@@ -180,11 +187,28 @@ static void
 children_flush(Local_Stack *data)
 {
    Eina_Iterator *children = outputter_children_get(data->onode, EFL_UI_NODE_CHILDREN_TYPE_ALL);
-   Outputter_Child *child;
+   Efl_Ui_Group_Item *linear = NULL, *table = NULL, *part = NULL;
    Eina_Strbuf *text = eina_strbuf_new();
+   enum Efl_Ui_Node_Children_Type type;
+   Outputter_Child *child;
    int i = 0;
 
+   type = outputter_node_possible_types_get(data->onode);
    efl_pack_clear(data->data->children);
+
+#define ITEM_GROUP(t, l, text, cb) \
+   if (type & t) \
+     { \
+        New_Child_Item_Data *new_child = new_child_item_gen(data->data->children); \
+        l = new_child->root; \
+        efl_event_callback_add(new_child->new, EFL_INPUT_EVENT_CLICKED, cb, data); \
+        efl_pack_end(data->data->children, new_child->root); \
+        efl_text_set(new_child->root, text); \
+        free(new_child); \
+     }
+   ITEM_GROUP(EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR, linear, "Linear", _add_new_child_linear_cb)
+   ITEM_GROUP(EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE, table, "Table", _add_new_child_table_cb)
+   ITEM_GROUP(EFL_UI_NODE_CHILDREN_TYPE_PACK, part, "Part", _add_new_child_part_cb)
 
    EINA_ITERATOR_FOREACH(children, child)
      {
@@ -203,23 +227,29 @@ children_flush(Local_Stack *data)
              case EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR: {
                i++;
                eina_strbuf_append_printf(text, "(%d)", i);
+               EINA_SAFETY_ON_NULL_RETURN(linear);
+               efl_pack_end(linear, pd->root);
              }
              break;
              case EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE: {
                eina_strbuf_append_printf(text, "(%d,%d,%d,%d)",
                 child->table.x, child->table.y,
                 child->table.w, child->table.h);
+               EINA_SAFETY_ON_NULL_RETURN(table);
+               efl_pack_end(table, pd->root);
              }
              break;
              case EFL_UI_NODE_CHILDREN_TYPE_PACK: {
                eina_strbuf_append_printf(text, "(%s)", child->pack.pack);
+               EINA_SAFETY_ON_NULL_RETURN(part);
+               efl_pack_end(part, pd->root);
              }
              break;
              default:
              break;
           }
         efl_text_set(pd->root, eina_strbuf_string_get(text));
-        efl_pack_end(data->data->children, pd->root);
+
         efl_event_callback_add(pd->root, EFL_INPUT_EVENT_CLICKED, _push_node_cb, child->child);
         efl_event_callback_add(pd->delete, EFL_INPUT_EVENT_CLICKED, _delete_child_cb, data->tnode);
         efl_key_data_set(pd->delete, "__child", child->child);
@@ -227,15 +257,6 @@ children_flush(Local_Stack *data)
      }
    eina_strbuf_free(text);
    eina_iterator_free(children);
-
-   // new property item
-   New_Entry_Item_Data *new_item = new_entry_item_gen(data->data->properties);
-   efl_event_callback_add(new_item->new, EFL_INPUT_EVENT_CLICKED, _add_new_child_cb, data);
-   efl_pack_end(data->data->children, new_item->root);
-
-   //FIXME add a way for different children
-
-   free(new_item);
 }
 
 static void

@@ -199,23 +199,23 @@ find_all_arguments(Eolian_State *state, const char *klass_name, const char *prop
 }
 
 enum Efl_Ui_Node_Children_Type
-fetch_usage(Eolian_State *state, const char *klass)
+fetch_usage(Eolian_State *state, const Eolian_Class *eolian_klass)
 {
-   const Eolian_Class *eolian_klass = find_klass(state, klass);
    const Eolian_Class *pack_linear = find_klass(state, "Efl.Pack_Linear");
    const Eolian_Class *pack_table = find_klass(state, "Efl.Pack_Table");
    const Eolian_Class *pack_part = find_klass(state, "Efl.Part");
+   enum Efl_Ui_Node_Children_Type type = EFL_UI_NODE_CHILDREN_TYPE_NOTHING;
 
    if (eolian_class_isa(eolian_klass, pack_linear))
-     return EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR;
+     type |= EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR;
 
    if (eolian_class_isa(eolian_klass, pack_table))
-     return EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE;
+     type |= EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE;
 
    if (eolian_class_isa(eolian_klass, pack_part))
-     return EFL_UI_NODE_CHILDREN_TYPE_PACK;
+     type |= EFL_UI_NODE_CHILDREN_TYPE_PACK;
 
-   return EFL_UI_NODE_CHILDREN_TYPE_NOTHING;
+   return type;
 }
 
 void

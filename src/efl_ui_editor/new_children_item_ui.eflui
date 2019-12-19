@@ -1,0 +1,19 @@
+{
+  "ui-name" : "New_Child_Item",
+  "ui-content" : {
+    "type": "Efl.Ui.Group_Item",
+    "id" : "root",
+    "text" : "<Overwrite>",
+    "pack-part" : [
+        {
+          "type" : "Efl.Ui.Button",
+          "id" : "new",
+          "part" : "icon",
+          "content" : {
+              "type" : "Efl.Ui.Image",
+              "icon" : "document-new",
+          }
+        }
+     ]
+   },
+}

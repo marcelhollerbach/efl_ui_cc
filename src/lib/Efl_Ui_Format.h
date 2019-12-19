@@ -61,6 +61,7 @@ const char* outputter_node_id_get(Outputter_Node *node);
 Outputter_Node* outputter_node_init(Eolian_State *s, Efl_Ui* ui, const char **name, void (*value_transform)(const Eolian_Type *etype, Eina_Strbuf *buf, const char *value));
 void outputter_node_root_free(Outputter_Node* node);
 enum Efl_Ui_Node_Children_Type outputter_node_available_types_get(Outputter_Node *node);
+enum Efl_Ui_Node_Children_Type outputter_node_possible_types_get(Outputter_Node *node);
 
 Efl_Ui_Node *outputter_node_get(Outputter_Node *node);
 Efl_Ui_Property* outputter_property_property_get(Outputter_Property *prop);

@@ -8,7 +8,8 @@ ui_files = [
   'abstract_node_ui',
   'property_item_ui',
   'property_name_ui',
-  'new_entry_item_ui',
+  'new_property_item_ui',
+  'new_children_item_ui',
   'children_item_ui',
   'value_change_bool_ui',
   'value_change_range_ui',
@@ -24,7 +25,7 @@ foreach ui_file : ui_files
   )
 endforeach
 
-executable('efl_ui_editor',
+editor = executable('efl_ui_editor',
   ['main.c', 'json_generator.c', 'object_generator.c',
    'base_ui.c', 'display_ui.c', 'abstract_tree_controller.c',
    'predictor_ui.c', 'value_change_ui.c', gen_files],
