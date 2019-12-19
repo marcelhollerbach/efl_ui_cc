@@ -220,15 +220,17 @@ safe_file(void)
 {
    //just a hack because i dont trust it yet that much
    Eina_Strbuf *new_file_name = eina_strbuf_new();
-
    eina_strbuf_append(new_file_name, path);
    eina_strbuf_append(new_file_name, ".new");
+   char *file_path = eina_strbuf_release(new_file_name);
 
    EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
    char *json = json_output(editor_state, ui_tree);
    EINA_SAFETY_ON_NULL_RETURN(json);
 
-   FILE *f = fopen(eina_strbuf_release(new_file_name), "w+");
+   FILE *f = fopen(file_path, "w+");
    fwrite(json, 1, strlen(json), f);
    fclose(f);
+
+   printf("File stored in %s\n", file_path);
 }
