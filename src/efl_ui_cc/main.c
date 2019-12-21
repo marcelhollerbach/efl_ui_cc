@@ -4,6 +4,7 @@
 #include <Eolian.h>
 #include <unistd.h>
 #include <Efl_Ui_Format.h>
+#include "errno.h"
 
 const char *input_file = NULL;
 const char *output_c_file = NULL;
@@ -36,7 +37,16 @@ dump_output(const char *file, const char *content)
    FILE *f;
 
    f = fopen(file, "w");
-   fwrite(content, strlen(content), 1, f);
+   if (!f)
+     {
+        printf("Failed to open file at %s\n", file);
+        return;
+     }
+   if (!fwrite(content, strlen(content), 1, f))
+     {
+        printf("Failed to write file: %s\n", strerror(ferror(f)));
+        return;
+     }
    fclose(f);
 }
 

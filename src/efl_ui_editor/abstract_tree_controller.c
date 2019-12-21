@@ -229,7 +229,16 @@ safe_file(void)
    EINA_SAFETY_ON_NULL_RETURN(json);
 
    FILE *f = fopen(file_path, "w+");
-   fwrite(json, 1, strlen(json), f);
+   if (!f)
+     {
+        printf("Failed to open file at %s\n", file_path);
+        return;
+     }
+   if (!fwrite(json, strlen(json), 1, f))
+     {
+        printf("Failed to write file: %s\n", strerror(ferror(f)));
+        return;
+     }
    fclose(f);
 
    printf("File stored in %s\n", file_path);
