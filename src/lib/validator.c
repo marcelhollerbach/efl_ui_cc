@@ -32,20 +32,19 @@ _print_position(const Validator_Context *ctx)
      {
         const char *opener = "in";
 
-        if (!first)
-          printf(", ");
-        else
-          opener = "In";
+        if (first)
+          opener = " In";
 
-        printf("%s ", node->placment_context);
+        if (node->placment_context && strlen(node->placment_context) > 0)
+          printf("%s, ", node->placment_context);
         if (node->node->id)
-          printf("%s \"%s\"", opener, node->node->id);
+          printf("%s \"%s\" ", opener, node->node->id);
         else
-          printf("%s \"%s\"", opener, node->node->type);
+          printf("%s \"%s\" ", opener, node->node->type);
         first = EINA_FALSE;
      }
    eina_iterator_free(msgs);
-   printf(":\n");
+   printf(":\n   ");
 }
 
 static Eina_Bool
