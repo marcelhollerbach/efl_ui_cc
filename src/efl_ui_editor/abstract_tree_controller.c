@@ -17,29 +17,33 @@ void
 change_type(Efl_Ui_Node *node, const char *type)
 {
    const Eolian_Class *klass = find_klass(editor_state, type);
+   Eina_Array *stack = eina_array_new(10);
+   enum Efl_Ui_Node_Children_Type available = fetch_usage(editor_state, klass);
 
    EINA_SAFETY_ON_NULL_RETURN(klass);
 
    node_type_set(node, type);
-   int shifter = 0;
 
    for (int i = 0; i < eina_array_count(node->properties); ++i)
      {
         Efl_Ui_Property *prop = eina_array_data_get(node->properties, i);
 
         if (!find_function(editor_state, klass, prop->key))
-          shifter ++;
-        if (shifter)
-          {
-             Efl_Ui_Property *propn = eina_array_data_get(node->properties, i+shifter);
-             eina_array_data_set(node->properties, i, propn);
-          }
+          eina_array_push(stack, prop->key);
      }
-    node->properties->count -= shifter;
 
-    //FIXME remove children if needed
-    EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
-    propagate_tree_change();
+   while(eina_array_count(stack) > 0)
+     node_property_remove(node, eina_array_pop(stack));
+
+   if ((available & EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR) == 0)
+     node_delete_children(node, EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR);
+   if ((available & EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE) == 0)
+     node_delete_children(node, EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE);
+   if ((available & EFL_UI_NODE_CHILDREN_TYPE_PACK) == 0)
+     node_delete_children(node, EFL_UI_NODE_CHILDREN_TYPE_PACK);
+
+   EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
+   propagate_tree_change();
 }
 
 void
@@ -142,32 +146,9 @@ add_property(Efl_Ui_Node *node, const char *prop_name)
 void
 del_property(Efl_Ui_Node *node, const char *prop_name)
 {
-   int shifter = 0;
-   Efl_Ui_Property *p;
-   for (int i = 0; i < eina_array_count(node->properties); ++i)
-     {
-        Efl_Ui_Property *prop = eina_array_data_get(node->properties, i);
-
-        if (!strcmp(prop->key, prop_name))
-          {
-             p = prop;
-             shifter ++;
-          }
-
-        if (shifter)
-          {
-             void *n = NULL;
-
-             if (i + shifter < eina_array_count(node->properties))
-               n = eina_array_data_get(node->properties, i + shifter);
-
-             eina_array_data_set(node->properties, i, n);
-          }
-     }
-   node->properties->count -= shifter;
+   node_property_remove(node, prop_name);
    EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
    propagate_tree_change();
-   free(p);
 }
 
 void

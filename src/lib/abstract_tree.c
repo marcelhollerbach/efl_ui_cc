@@ -153,6 +153,69 @@ node_child_remove(Efl_Ui_Node *node, Efl_Ui_Node *child)
    free(child);
 }
 
+static void
+_property_free(Efl_Ui_Property *property)
+{
+   if (property->key)
+     free((char*)property->key);
+
+   Efl_Ui_Property_Value *value;
+   while(eina_array_count(property->value))
+     {
+        value = eina_array_pop(property->value);
+        if (value->is_node)
+          efl_ui_node_free(value->node);
+        else if (value->value)
+          free((char*)value->value);
+        free(value);
+     }
+   eina_array_free(property->value);
+   free(property);
+}
+
+static void
+_free_linear_children(Efl_Ui_Node *node)
+{
+   while (eina_array_count(node->children_linear))
+     {
+        Efl_Ui_Pack_Linear *linear = eina_array_pop(node->children_linear);
+        efl_ui_node_free(linear->basic.node);
+        free(linear);
+     }
+}
+
+static void
+_free_table_children(Efl_Ui_Node *node)
+{
+   while (eina_array_count(node->children_table))
+     {
+        Efl_Ui_Pack_Table *table = eina_array_pop(node->children_table);
+        if (table->x)
+          free((char*)table->x);
+        if (table->y)
+          free((char*)table->y);
+        if (table->w)
+          free((char*)table->w);
+        if (table->h)
+          free((char*)table->h);
+        efl_ui_node_free(table->basic.node);
+        free(table);
+     }
+}
+
+static void
+_free_part_children(Efl_Ui_Node *node)
+{
+   while (eina_array_count(node->children_part))
+     {
+        Efl_Ui_Pack_Pack *pack = eina_array_pop(node->children_part);
+        if (pack->part_name)
+          free((char*)pack->part_name);
+        efl_ui_node_free(pack->basic.node);
+        free(pack);
+     }
+}
+
 void
 efl_ui_node_free(Efl_Ui_Node *node)
 {
@@ -169,60 +232,20 @@ efl_ui_node_free(Efl_Ui_Node *node)
       while(eina_array_count(node->properties))
         {
            property = eina_array_pop(node->properties);
-
-           if (property->key)
-             free((char*)property->key);
-
-           Efl_Ui_Property_Value *value;
-           while(eina_array_count(property->value))
-             {
-                value = eina_array_pop(property->value);
-                if (value->is_node)
-                  efl_ui_node_free(value->node);
-                else if (value->value)
-                  free((char*)value->value);
-                free(value);
-             }
-           eina_array_free(property->value);
-           free(property);
+           _property_free(property);
         }
    }
    eina_array_free(node->properties);
 
    //handle children
    {
-      while (eina_array_count(node->children_linear))
-        {
-           Efl_Ui_Pack_Linear *linear = eina_array_pop(node->children_linear);
-
-           efl_ui_node_free(linear->basic.node);
-           free(linear);
-        }
+      _free_linear_children(node);
       eina_array_free(node->children_linear);
 
-      while (eina_array_count(node->children_table))
-        {
-           Efl_Ui_Pack_Table *table = eina_array_pop(node->children_table);
-           if (table->x)
-             free((char*)table->x);
-           if (table->y)
-             free((char*)table->y);
-           if (table->w)
-             free((char*)table->w);
-           if (table->h)
-             free((char*)table->h);
-           efl_ui_node_free(table->basic.node);
-           free(table);
-        }
+      _free_table_children(node);
       eina_array_free(node->children_table);
-      while (eina_array_count(node->children_part))
-        {
-           Efl_Ui_Pack_Pack *pack = eina_array_pop(node->children_part);
-           if (pack->part_name)
-             free((char*)pack->part_name);
-           efl_ui_node_free(pack->basic.node);
-           free(pack);
-        }
+
+      _free_part_children(node);
       eina_array_free(node->children_part);
    }
    if (node)
@@ -242,4 +265,32 @@ const char*
 node_id_get(Efl_Ui_Node *n)
 {
    return n->id;
+}
+
+static Eina_Bool
+_delete_property(void *data, void *name)
+{
+   Efl_Ui_Property *property = data;
+
+   Eina_Bool equal = eina_streq(property->key, name);
+   if (!equal)
+     _property_free(property);
+   return !equal;
+}
+
+void
+node_property_remove(Efl_Ui_Node *node, const char *property)
+{
+   eina_array_remove(node->properties, _delete_property, (char*)property);
+}
+
+void
+node_delete_children(Efl_Ui_Node *node, enum Efl_Ui_Node_Children_Type type)
+{
+   if (type == EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR)
+     _free_linear_children(node);
+   if (type == EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE)
+     _free_table_children(node);
+   if (type == EFL_UI_NODE_CHILDREN_TYPE_PACK)
+     _free_part_children(node);
 }

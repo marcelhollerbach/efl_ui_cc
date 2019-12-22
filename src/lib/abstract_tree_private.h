@@ -1,6 +1,7 @@
 #ifndef UI_TREE_H
 #define UI_TREE_H
 
+#include <Efl_Ui_Format.h>
 #include <abstract_tree.h>
 
 struct _Efl_Ui_Node {

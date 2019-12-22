@@ -28,14 +28,6 @@ typedef struct {
   Eina_Iterator *values;
 } Outputter_Property;
 
-enum Efl_Ui_Node_Children_Type {
-  EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR = 1,
-  EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE = 2,
-  EFL_UI_NODE_CHILDREN_TYPE_PACK = 4,
-  EFL_UI_NODE_CHILDREN_TYPE_NOTHING = 0,
-  EFL_UI_NODE_CHILDREN_TYPE_ALL = 7,
-};
-
 typedef struct {
   Outputter_Node *child;
   enum Efl_Ui_Node_Children_Type type;
