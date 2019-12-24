@@ -116,6 +116,8 @@ change_value(Outputter_Property_Value *value, Eo *anchor_widget)
         selection->selector = data->text_selector;
         selection->get_value = _fetch_text_cb;
         efl_text_set(data->text_selector, value->value);
+        efl_ui_focus_util_focus(data->text_selector);
+        efl_text_interactive_all_select(data->text_selector);
      }
    else if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
      {
@@ -187,6 +189,8 @@ change_name(Efl_Ui_Node *node, Eo *anchor_widget)
    efl_gfx_entity_visible_set(data->root, EINA_TRUE);
    efl_text_set(s->selector, id);
 
+   efl_ui_focus_util_focus(s->selector);
+   efl_text_interactive_all_select(s->selector);
 
    return eina_future_new(s->ctx);
 }
