@@ -273,7 +273,7 @@ _delete_property(void *data, void *name)
    Efl_Ui_Property *property = data;
 
    Eina_Bool equal = eina_streq(property->key, name);
-   if (!equal)
+   if (equal)
      _property_free(property);
    return !equal;
 }
