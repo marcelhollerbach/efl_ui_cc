@@ -52,6 +52,11 @@ validate_builtin_property_values(const Validator_Context *ctx, const Eolian_Type
 {
    Eolian_Type_Builtin_Type builtin = eolian_type_builtin_type_get(type);
 
+   if (!value)
+     {
+        ERROR_OUT(ctx, "Values are NULL");
+     }
+
    if (builtin >= EOLIAN_TYPE_BUILTIN_BYTE && builtin <= EOLIAN_TYPE_BUILTIN_PTRDIFF)
      {
         char *tmp_end;
@@ -150,6 +155,12 @@ validate_property(Validator_Context *ctx, const Eolian_Class *klass, Efl_Ui_Prop
         Efl_Ui_Property_Value *value = eina_array_data_get(node->value, c);
         const Eolian_Typedecl *decl = eolian_type_typedecl_get(type);
 
+        if (c >= eina_array_count(node->value))
+          {
+             eina_iterator_free(parameters);
+             ERROR_OUT(ctx, "Too few parameters supplied.\n");
+          }
+        value = eina_array_data_get(node->value, c);
         fetch_real_typedecl(&decl, &type);
 
         switch(eolian_type_type_get(type))
@@ -170,6 +181,10 @@ validate_property(Validator_Context *ctx, const Eolian_Class *klass, Efl_Ui_Prop
                     }
                   else
                     {
+                       if (!value)
+                         {
+                            ERROR_OUT(ctx, "Value is NULL");
+                         }
                        if (!validate_builtin_property_values(ctx, type, value))
                          {
                             eina_iterator_free(parameters);
