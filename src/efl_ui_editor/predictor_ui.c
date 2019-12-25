@@ -2,6 +2,7 @@
 #include "main.h"
 #include <Efl_Ui_Format.h>
 #include "predictor.h"
+#include "predictor_ui.h"
 #include "property_name_ui.h"
 
 static Eina_Promise*
@@ -37,39 +38,36 @@ _types_selection_changed_cb(void *data, const Efl_Event *ev)
 Eina_Future*
 select_available_types(void)
 {
-   static Efl_Ui_Popup *popup = NULL;
+   static Predictor_Ui_Data *data;
    Eina_Promise *ctx = efl_loop_promise_new(efl_main_loop_get());
 
-   if (!popup)
+   if (!data)
      {
-        Efl_Ui_List *container;
         Predicted_Class *klass;
 
-        popup = efl_add(EFL_UI_POPUP_CLASS, efl_provider_find(win, EFL_UI_WIN_CLASS));
-        efl_event_callback_add(popup, EFL_UI_POPUP_EVENT_BACKWALL_CLICKED, _types_hide_cb, NULL);
-        container = efl_add(EFL_UI_LIST_CLASS, popup);
-        efl_gfx_hint_size_min_set(container, EINA_SIZE2D(250, 250));
-        efl_content_set(popup, container);
-        efl_event_callback_add(container, EFL_UI_SELECTABLE_EVENT_SELECTION_CHANGED, _types_selection_changed_cb, popup);
+        data = predictor_ui_gen(win);
+        efl_gfx_hint_size_min_set(data->container, EINA_SIZE2D(250, 250));
+        efl_event_callback_add(data->root, EFL_UI_POPUP_EVENT_BACKWALL_CLICKED, _types_hide_cb, NULL);
+        efl_event_callback_add(data->container, EFL_UI_SELECTABLE_EVENT_SELECTION_CHANGED, _types_selection_changed_cb, data->root);
 
         klass = get_available_types();
 
         for (int i = 0; klass[i].klass_name; ++i)
           {
-             Efl_Ui_Default_Item *item = efl_add(EFL_UI_LIST_DEFAULT_ITEM_CLASS, container);
+             Efl_Ui_Default_Item *item = efl_add(EFL_UI_LIST_DEFAULT_ITEM_CLASS, data->container);
              efl_gfx_hint_size_min_set(item, EINA_SIZE2D(80, 50));
              efl_text_set(item, klass[i].klass_name);
-             efl_pack_end(container, item);
+             efl_pack_end(data->container, item);
           }
         free(klass);
      }
    //bind promise to the popup
-   EINA_SAFETY_ON_FALSE_RETURN_VAL(efl_key_data_get(popup, "__promise") == NULL, NULL);
-   efl_key_data_set(popup, "__promise", ctx);
+   EINA_SAFETY_ON_FALSE_RETURN_VAL(efl_key_data_get(data->root, "__promise") == NULL, NULL);
+   efl_key_data_set(data->root, "__promise", ctx);
 
-   Eo *container = efl_content_get(popup);
+   Eo *container = efl_content_get(data->root);
    efl_ui_multi_selectable_all_unselect(container);
-   efl_gfx_entity_visible_set(popup, EINA_TRUE);
+   efl_gfx_entity_visible_set(data->root, EINA_TRUE);
 
    return eina_future_new(ctx);
 }

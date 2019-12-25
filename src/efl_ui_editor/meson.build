@@ -14,6 +14,7 @@ ui_files = [
   'value_change_bool_ui',
   'value_change_range_ui',
   'value_change_text_ui',
+  'predictor_ui'
 ]
 gen_files = []
 

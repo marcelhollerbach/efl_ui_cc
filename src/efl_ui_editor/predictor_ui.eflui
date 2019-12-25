@@ -1,0 +1,22 @@
+{
+  "ui-name" : "Predictor_Ui",
+  "ui-content" :   {
+    "type" : "Efl.Ui.Popup",
+    "id" : "root",
+    "content" :   {
+     "type" : "Efl.Ui.Box",
+     "pack-linear" : [
+       {
+        "type" : "Efl.Ui.Textbox",
+        "editable" : false,
+        "text" : "Select new type:",
+        "hint_weight" : [1.000000, 0.0],
+      },
+       {
+        "type" : "Efl.Ui.List",
+        "id" : "container",
+      }
+     ],
+   },
+  }
+}
