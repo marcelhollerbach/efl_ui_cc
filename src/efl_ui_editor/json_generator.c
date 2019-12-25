@@ -141,7 +141,7 @@ json_output(const Eolian_State *s, const Efl_Ui *ui)
    name = eina_strdup(full_case_name);
    eina_str_tolower(&name);
    eina_strbuf_append_printf(type, "{\n");
-   eina_strbuf_append_printf(type, "  \"ui-name\" : \"%s\"\n", full_case_name);
+   eina_strbuf_append_printf(type, "  \"ui-name\" : \"%s\",\n", full_case_name);
    eina_strbuf_append_printf(type, "  \"ui-content\" : ");
    eina_strbuf_replace_all(main_func, "\n", "\n ");
    eina_strbuf_append_buffer(type, main_func);
