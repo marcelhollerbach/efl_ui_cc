@@ -25,12 +25,12 @@ _print_children(Json_Context *ctx, Outputter_Node *node, enum Efl_Ui_Node_Childr
         eina_strbuf_prepend(buf, "  ");
         eina_strbuf_replace_all(buf, "\n", "\n  ");
         if (i > 0)
-          eina_strbuf_append(current_object, ", \n");
+          eina_strbuf_append(current_object, ",\n");
         eina_strbuf_append_buffer(current_object, buf);
         eina_strbuf_free(buf);
         i++;
     }
-  eina_strbuf_append(current_object, "\n  ]\n");
+  eina_strbuf_append(current_object, "\n  ],\n");
   eina_iterator_free(children);
 }
 
@@ -116,7 +116,7 @@ _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
    if (type & EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE)
      _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE, "\"pack-table\"", current_object);
    if (type & EFL_UI_NODE_CHILDREN_TYPE_PACK)
-     _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK, "\"pack\"", current_object);
+     _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK, "\"pack-part\"", current_object);
    eina_strbuf_replace_all(current_object, "\n", "\n ");
    eina_strbuf_append(current_object, "}");
    return current_object;
