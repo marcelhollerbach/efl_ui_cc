@@ -110,11 +110,11 @@ _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
    //handle children
    enum Efl_Ui_Node_Children_Type type = outputter_node_available_types_get(n);
    if (type & EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR)
-     _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR, "pack-linear", current_object);
+     _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR, "\"pack-linear\"", current_object);
    if (type & EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE)
-     _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE, "pack-table", current_object);
+     _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE, "\"pack-table\"", current_object);
    if (type & EFL_UI_NODE_CHILDREN_TYPE_PACK)
-     _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK, "pack", current_object);
+     _print_children(ctx, n, EFL_UI_NODE_CHILDREN_TYPE_PACK, "\"pack\"", current_object);
    eina_strbuf_replace_all(current_object, "\n", "\n ");
    eina_strbuf_append(current_object, "}");
    return current_object;
