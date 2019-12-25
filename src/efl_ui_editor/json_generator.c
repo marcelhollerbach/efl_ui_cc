@@ -59,8 +59,10 @@ _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
           {
              eina_strbuf_append_printf(current_object, "  \"x\" : %d,\n", thischild->table.x);
              eina_strbuf_append_printf(current_object, "  \"y\" : %d,\n", thischild->table.y);
-             eina_strbuf_append_printf(current_object, "  \"w\" : %d,\n", thischild->table.w);
-             eina_strbuf_append_printf(current_object, "  \"h\" : %d,\n", thischild->table.h);
+             if (thischild->table.w > 0)
+               eina_strbuf_append_printf(current_object, "  \"w\" : %d,\n", thischild->table.w);
+             if (thischild->table.h > 0)
+               eina_strbuf_append_printf(current_object, "  \"h\" : %d,\n", thischild->table.h);
           }
         else if (thischild->type == EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR)
           {

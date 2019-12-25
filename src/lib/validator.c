@@ -311,6 +311,12 @@ validate_node(Validator_Context *ctx, Efl_Ui_Node *node, const char *placment_co
           {
              char buffer[100];
 
+             if (table->h <= 0)
+               ERROR_OUT(ctx, "Height cannot be 0");
+
+             if (table->w <= 0)
+               ERROR_OUT(ctx, "Width cannot be 0");
+
              snprintf(buffer, sizeof(buffer), "at position (%s, %s, %s, %s)", table->x, table->y, table->w, table->h);
              if (!validate_node(ctx, table->basic.node, buffer))
                {
