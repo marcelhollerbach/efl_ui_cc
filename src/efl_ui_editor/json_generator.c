@@ -75,6 +75,7 @@ _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
    EINA_ITERATOR_FOREACH(properties, property)
      {
         Outputter_Property_Value *value;
+        Eina_Strbuf *values = eina_strbuf_new();
         int i = 0;
 
         eina_strbuf_append_printf(current_object, "  \"%s\" : ", eolian_function_name_get(property->property));
@@ -82,20 +83,26 @@ _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
         EINA_ITERATOR_FOREACH(property->values, value)
           {
              if (i > 0)
-               eina_strbuf_append(current_object, ", ");
+               eina_strbuf_append(values, ", ");
              if (value->simple)
                {
-                  eina_strbuf_append(current_object, value->value);
+                  eina_strbuf_append(values, value->value);
                }
              else
                {
                   Eina_Strbuf *buf = _output_node(ctx, value->object, NULL);
-                  eina_strbuf_append_buffer(current_object, buf);
+                  eina_strbuf_append_buffer(values, buf);
                   eina_strbuf_free(buf);
                }
              i++;
           }
         eina_iterator_free(property->values);
+        if (i > 1)
+          eina_strbuf_append(current_object, "[");
+        eina_strbuf_append_buffer(current_object, values);
+        if (i > 1)
+          eina_strbuf_append(current_object, "]");
+        eina_strbuf_free(values);
         eina_strbuf_append(current_object, ",\n");
      }
    eina_iterator_free(properties);
