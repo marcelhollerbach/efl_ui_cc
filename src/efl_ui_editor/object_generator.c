@@ -159,7 +159,7 @@ _call_property(Object_Generator_Context *ctx, Eo *obj, Outputter_Property *prope
         const Eolian_Type *type = value->type;
         const Eolian_Type_Type ttype = eolian_type_type_get(type);
 
-        if (value->simple)
+        if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
           {
              const Eolian_Typedecl *decl = eolian_type_typedecl_get(type);
 
@@ -184,10 +184,6 @@ _call_property(Object_Generator_Context *ctx, Eo *obj, Outputter_Property *prope
                   types[value_count] = &ffi_type_uint32;
                   pointers[value_count] = (void*)(intptr_t)uvalue;
                }
-             else if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_STRUCT)
-               {
-
-               }
              else
                {
                   const Eolian_Type_Builtin_Type bt = eolian_type_builtin_type_get(type);
@@ -196,7 +192,12 @@ _call_property(Object_Generator_Context *ctx, Eo *obj, Outputter_Property *prope
                   fill_in_data(ctx, type, value, &pointers[value_count]);
                }
           }
-        else
+        else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_STRUCT)
+          {
+             printf("FIXME bailing out, no struct passing yet\n");
+             return EINA_TRUE;
+          }
+        else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_NODE)
           {
              //recursive depth for creating the tree
              EINA_SAFETY_ON_FALSE_RETURN_VAL(ttype == EOLIAN_TYPE_CLASS, EINA_FALSE);

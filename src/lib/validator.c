@@ -13,6 +13,7 @@ typedef struct {
 } Validator_Context_Message_Node;
 
 static Eina_Bool validate_node(Validator_Context *ctx, Efl_Ui_Node *node, const char *placment_context);
+static Eina_Bool validate_struct_values(Validator_Context *ctx, const Eolian_Typedecl *decl, const Efl_Ui_Property_Value *value);
 
 #define ERROR_OUT(ctx, ...) \
   do { \
@@ -60,7 +61,7 @@ validate_builtin_property_values(const Validator_Context *ctx, const Eolian_Type
    if (builtin >= EOLIAN_TYPE_BUILTIN_BYTE && builtin <= EOLIAN_TYPE_BUILTIN_PTRDIFF)
      {
         char *tmp_end;
-        if (value->is_node)
+        if (value->type != EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
           {
             ERROR_OUT(ctx, "Expected a number\n");
           }
@@ -73,7 +74,7 @@ validate_builtin_property_values(const Validator_Context *ctx, const Eolian_Type
    else if (builtin >= EOLIAN_TYPE_BUILTIN_FLOAT && builtin <= EOLIAN_TYPE_BUILTIN_DOUBLE)
      {
         char *tmp_end;
-        if (value->is_node)
+        if (value->type != EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
           {
             ERROR_OUT(ctx, "Expected a float\n");
           }
@@ -86,7 +87,7 @@ validate_builtin_property_values(const Validator_Context *ctx, const Eolian_Type
      }
    else if (builtin == EOLIAN_TYPE_BUILTIN_BOOL)
      {
-        if (value->is_node)
+        if (value->type != EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
           {
             ERROR_OUT(ctx, "Expected true or false\n");
           }
@@ -97,7 +98,7 @@ validate_builtin_property_values(const Validator_Context *ctx, const Eolian_Type
      }
    else if (builtin >= EOLIAN_TYPE_BUILTIN_MSTRING && builtin <= EOLIAN_TYPE_BUILTIN_STRINGSHARE)
      {
-        if (value->is_node)
+        if (value->type != EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
           {
             ERROR_OUT(ctx, "Expected a String\n");
           }
@@ -136,6 +137,101 @@ validate_enum_values(const Validator_Context *ctx, const Eolian_Typedecl *type, 
 }
 
 static Eina_Bool
+validate_parameter_value(Validator_Context *ctx, const char *context_name, const Eolian_Typedecl *decl, const Eolian_Type *type, const Efl_Ui_Property_Value *value)
+{
+   switch(eolian_type_type_get(type))
+     {
+        case EOLIAN_TYPE_VOID:
+          EINA_LOG_ERR("EOLIAN_TYPE_VOID should not happen as a paramter");
+        break;
+        case EOLIAN_TYPE_REGULAR:
+          {
+             //a regular can be a number or a enum it seems ?
+             if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
+               {
+                  if (!validate_enum_values(ctx, decl, value))
+                    {
+                       return EINA_FALSE;
+                    }
+               }
+             else if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_STRUCT)
+               {
+                  if (!validate_struct_values(ctx, decl, value))
+                    {
+                       return EINA_FALSE;
+                    }
+               }
+             else
+               {
+                  if (!value)
+                    {
+                       ERROR_OUT(ctx, "Value is NULL\n");
+                    }
+                  if (!validate_builtin_property_values(ctx, type, value))
+                    {
+                       return EINA_FALSE;
+                    }
+               }
+          }
+        break;
+        case EOLIAN_TYPE_CLASS: {
+          char buffer[100];
+          if (value->type != EFL_UI_PROPERTY_VALUE_TYPE_NODE)
+            {
+               ERROR_OUT(ctx, "Expected a Object");
+            }
+          snprintf(buffer, sizeof(buffer), "at property %s", context_name);
+          if (!validate_node(ctx, value->node, buffer))
+            {
+               return EINA_FALSE;
+            }
+        }
+        break;
+        default:
+          EINA_LOG_ERR("This is an error");
+        break;
+     }
+   return EINA_TRUE;
+}
+
+static Eina_Bool
+validate_struct_values(Validator_Context *ctx, const Eolian_Typedecl *upper_decl, const Efl_Ui_Property_Value *upper_value)
+{
+   Eolian_Struct_Type_Field *field;
+   if (upper_value->type != EFL_UI_PROPERTY_VALUE_TYPE_STRUCT)
+     {
+        ERROR_OUT(ctx, "Value must be a array\n");
+     }
+   Efl_Ui_Struct *str = upper_value->str;
+   Eina_Iterator *struct_fields = eolian_typedecl_struct_fields_get(upper_decl);
+   int c = 0;
+   EINA_ITERATOR_FOREACH(struct_fields, field)
+     {
+        const Eolian_Type *type = eolian_typedecl_struct_field_type_get(field);
+        const Efl_Ui_Property_Value *value = eina_array_data_get(str->fields, c);
+        const Eolian_Typedecl *decl = eolian_type_typedecl_get(type);
+        if (c >= eina_array_count(str->fields))
+          {
+             eina_iterator_free(struct_fields);
+             ERROR_OUT(ctx, "Too few parameters supplied.\n");
+          }
+        fetch_real_typedecl(&decl, &type);
+        if (!validate_parameter_value(ctx, "struct parameter", decl, type, value))
+          {
+             eina_iterator_free(struct_fields);
+             return EINA_FALSE;
+          }
+        c++;
+     }
+   eina_iterator_free(struct_fields);
+   if (c != eina_array_count(str->fields))
+     {
+        ERROR_OUT(ctx, "Too many arguments supplied\n");
+     }
+   return EINA_TRUE;
+}
+
+static Eina_Bool
 validate_property(Validator_Context *ctx, const Eolian_Class *klass, Efl_Ui_Property *node)
 {
    const Eolian_Function *f;
@@ -160,55 +256,12 @@ validate_property(Validator_Context *ctx, const Eolian_Class *klass, Efl_Ui_Prop
              eina_iterator_free(parameters);
              ERROR_OUT(ctx, "Too few parameters supplied.\n");
           }
-        value = eina_array_data_get(node->value, c);
         fetch_real_typedecl(&decl, &type);
-
-        switch(eolian_type_type_get(type))
+        if (!validate_parameter_value(ctx, node->key, decl, type, value))
           {
-             case EOLIAN_TYPE_VOID:
-               EINA_LOG_ERR("EOLIAN_TYPE_VOID should not happen as a paramter");
-             break;
-             case EOLIAN_TYPE_REGULAR:
-               {
-                  //a regular can be a number or a enum it seems ?
-                  if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
-                    {
-                       if (!validate_enum_values(ctx, decl, value))
-                         {
-                            eina_iterator_free(parameters);
-                            return EINA_FALSE;
-                         }
-                    }
-                  else
-                    {
-                       if (!value)
-                         {
-                            ERROR_OUT(ctx, "Value is NULL\n");
-                         }
-                       if (!validate_builtin_property_values(ctx, type, value))
-                         {
-                            eina_iterator_free(parameters);
-                            return EINA_FALSE;
-                         }
-                    }
-               }
-             break;
-             case EOLIAN_TYPE_CLASS: {
-               char buffer[100];
-               EINA_SAFETY_ON_FALSE_RETURN_VAL(value->is_node, EINA_FALSE);
-               snprintf(buffer, sizeof(buffer), "at property %s", node->key);
-               if (!validate_node(ctx, value->node, buffer))
-                 {
-                    eina_iterator_free(parameters);
-                    return EINA_FALSE;
-                 }
-             }
-             break;
-             default:
-               EINA_LOG_ERR("This is an error");
-             break;
+             eina_iterator_free(parameters);
+             return EINA_FALSE;
           }
-
         c++;
      }
    eina_iterator_free(parameters);

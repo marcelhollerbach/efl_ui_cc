@@ -4,6 +4,7 @@
 #include <Efl_Ui_Format.h>
 #include <abstract_tree.h>
 
+
 struct _Efl_Ui_Node {
    const char *id;   //Id of the name of this node
    const char *type; //String of the Eolian type
@@ -19,9 +20,10 @@ struct _Efl_Ui_Property {
 };
 
 struct _Efl_Ui_Property_Value {
-   Eina_Bool is_node;
+   enum Efl_Ui_Property_Value_Type type;
    union {
       Efl_Ui_Node *node;
+      Efl_Ui_Struct *str;
       const char *value;
    };
 };
@@ -50,6 +52,10 @@ struct _Efl_Ui_Pack_Pack {
 struct _Efl_Ui {
    const char *name;
    Efl_Ui_Node *content;
+};
+
+struct _Efl_Ui_Struct {
+   Eina_Array *fields; //these are property values
 };
 
 #endif

@@ -4,5 +4,6 @@
     "type" : "Efl.Ui.Button",
     "id" : "basic",
     "text" : "test",
+    "hint_size_min" : [[12, 20]],
   }
 }

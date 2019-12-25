@@ -12,16 +12,23 @@ Eina_Bool validate(Eolian_State *state, Efl_Ui *ui);
 void efl_ui_free(Efl_Ui *ui);
 
 typedef struct _Outputter_Node Outputter_Node;
+typedef struct _Outputter_Struct Outputter_Struct;
 
 typedef struct {
   const Eolian_Type *type;
-  Eina_Bool simple;
+  enum Efl_Ui_Property_Value_Type node_type;
   union {
     Outputter_Node *object;
+    Outputter_Struct *str;
     const char *value;
   };
   const char *argument;
 } Outputter_Property_Value;
+
+struct _Outputter_Struct {
+  const Eolian_Typedecl *decl;
+  Eina_Iterator *values;
+};
 
 typedef struct {
   const Eolian_Function *property;

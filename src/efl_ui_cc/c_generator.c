@@ -6,6 +6,48 @@ typedef struct {
    Eina_Strbuf *typedef_fields;
 } Generator_Context;
 
+static Eina_Strbuf* _output_node(Generator_Context *ctx, Outputter_Node *n);
+
+static void
+_output_property_values(Generator_Context *ctx, const char *func_name, Eina_Iterator *values, Eina_Strbuf *code_before, Eina_Strbuf *params)
+{
+   Outputter_Property_Value *value;
+   int i = 0;
+
+   EINA_ITERATOR_FOREACH(values, value)
+     {
+        if (i != 0)
+          eina_strbuf_append(params, ", ");
+        if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
+          {
+             eina_strbuf_append(params, value->value);
+          }
+        else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_NODE)
+          {
+             Eina_Strbuf *buf = _output_node(ctx, value->object);
+             eina_strbuf_append_buffer(code_before, buf);
+             eina_strbuf_append_printf(code_before, "   Eo *%s%d = child;\n", func_name, i);
+             eina_strbuf_append_printf(params, "%s%d", func_name, i);
+             eina_strbuf_free(buf);
+          }
+        else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_STRUCT)
+          {
+             //const char *struct_name = eolian_typedecl_name_get(value->str->decl);
+             const char *struct_name = eolian_typedecl_c_name_get(value->str->decl);
+             Eina_Strbuf *context_name = eina_strbuf_new();
+             eina_strbuf_append_printf(context_name, "%s%d", func_name, i);
+
+             eina_strbuf_append_printf(params, "((%s){", struct_name);
+             _output_property_values(ctx, eina_strbuf_string_get(context_name), value->str->values, code_before, params);
+             eina_strbuf_append(params, "})");
+
+             eina_strbuf_free(context_name);
+          }
+        i++;
+     }
+   eina_iterator_free(values);
+}
+
 static Eina_Strbuf*
 _output_node(Generator_Context *ctx, Outputter_Node *n)
 {
@@ -32,30 +74,12 @@ _output_node(Generator_Context *ctx, Outputter_Node *n)
    Eina_Iterator *properties = outputter_properties_get(n);
    EINA_ITERATOR_FOREACH(properties, property)
      {
-        Outputter_Property_Value *value;
         Eina_Strbuf *params = eina_strbuf_new();
-        eina_strbuf_append(params, "o");
-        int i = 0;
+        const char *func_name;
 
-        EINA_ITERATOR_FOREACH(property->values, value)
-          {
-             eina_strbuf_append(params, ", ");
-             if (value->simple)
-               {
-                  eina_strbuf_append(params, value->value);
-               }
-             else
-               {
-                  const char *func_name = eolian_object_name_get(EOLIAN_OBJECT(property->property));
-                  Eina_Strbuf *buf = _output_node(ctx, value->object);
-                  eina_strbuf_append_buffer(func_calls, buf);
-                  eina_strbuf_append_printf(func_calls, "   Eo *%s%d = child;\n", func_name, i);
-                  eina_strbuf_append_printf(params, "%s%d", func_name, i);
-                  eina_strbuf_free(buf);
-               }
-             i++;
-          }
-        eina_iterator_free(property->values);
+        func_name = eolian_object_name_get(EOLIAN_OBJECT(property->property));
+        eina_strbuf_append(params, "o, ");
+        _output_property_values(ctx, func_name, property->values, func_calls, params);
         eina_strbuf_append_printf(func_calls, "   %s(%s);\n", eolian_function_full_c_name_get(property->property, EOLIAN_PROP_SET), eina_strbuf_string_get(params));
         eina_strbuf_free(params);
      }

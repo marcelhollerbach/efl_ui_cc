@@ -60,17 +60,41 @@ property_value_append(Efl_Ui_Property *prop)
 Efl_Ui_Node*
 property_value_node(Efl_Ui_Property_Value *val)
 {
+   EINA_SAFETY_ON_FALSE_RETURN_VAL(val->type == EFL_UI_PROPERTY_VALUE_TYPE_NOTHING  || val->type == EFL_UI_PROPERTY_VALUE_TYPE_NODE, NULL);
    Efl_Ui_Node *node = create_node();
 
-   val->is_node = EINA_TRUE;
+   val->type = EFL_UI_PROPERTY_VALUE_TYPE_NODE;
    val->node = node;
    return node;
+}
+
+Efl_Ui_Struct*
+property_value_struct(Efl_Ui_Property_Value *val)
+{
+   EINA_SAFETY_ON_FALSE_RETURN_VAL(val->type == EFL_UI_PROPERTY_VALUE_TYPE_NOTHING || val->type == EFL_UI_PROPERTY_VALUE_TYPE_STRUCT, NULL);
+   Efl_Ui_Struct *str = calloc(1, sizeof(Efl_Ui_Struct));
+   str->fields = eina_array_new(10);
+
+   val->type = EFL_UI_PROPERTY_VALUE_TYPE_STRUCT;
+   val->str = str;
+   return str;
+}
+
+Efl_Ui_Property_Value*
+property_struct_value_append(Efl_Ui_Struct *str)
+{
+   Efl_Ui_Property_Value* ret = calloc(1, sizeof(Efl_Ui_Property_Value));
+
+   eina_array_push(str->fields, ret);
+
+   return ret;
 }
 
 void
 property_value_value(Efl_Ui_Property_Value *val, const char *value)
 {
-   val->is_node = EINA_FALSE;
+   EINA_SAFETY_ON_FALSE_RETURN(val->type == EFL_UI_PROPERTY_VALUE_TYPE_NOTHING || val->type == EFL_UI_PROPERTY_VALUE_TYPE_VALUE);
+   val->type = EFL_UI_PROPERTY_VALUE_TYPE_VALUE;
    if (val->value) free((char*)val->value);
    val->value = eina_strdup(value);
 }
@@ -154,6 +178,26 @@ node_child_remove(Efl_Ui_Node *node, Efl_Ui_Node *child)
 }
 
 static void
+efl_ui_struct_free(Efl_Ui_Struct *str)
+{
+   Efl_Ui_Property_Value *value;
+   while(eina_array_count(str->fields))
+     {
+        value = eina_array_pop(str->fields);
+        if (value->type == EFL_UI_PROPERTY_VALUE_TYPE_NODE)
+          efl_ui_node_free(value->node);
+        else if (value->type == EFL_UI_PROPERTY_VALUE_TYPE_STRUCT)
+          efl_ui_struct_free(value->str);
+        else if (value->type == EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
+          free((char*)value->value);
+
+        free(value);
+     }
+   eina_array_free(str->fields);
+   free(str);
+}
+
+static void
 _property_free(Efl_Ui_Property *property)
 {
    if (property->key)
@@ -163,10 +207,13 @@ _property_free(Efl_Ui_Property *property)
    while(eina_array_count(property->value))
      {
         value = eina_array_pop(property->value);
-        if (value->is_node)
+        if (value->type == EFL_UI_PROPERTY_VALUE_TYPE_NODE)
           efl_ui_node_free(value->node);
-        else if (value->value)
+        else if (value->type == EFL_UI_PROPERTY_VALUE_TYPE_STRUCT)
+          efl_ui_struct_free(value->str);
+        else if (value->type == EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
           free((char*)value->value);
+
         free(value);
      }
    eina_array_free(property->value);

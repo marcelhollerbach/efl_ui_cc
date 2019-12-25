@@ -117,11 +117,10 @@ _local_stack_update(Outputter_Node *node, Efl_Ui_Node *n)
 }
 
 static void
-_fill_property_values(Efl_Ui_Group_Item *item, Outputter_Property *property)
+_fill_property_values(Efl_Ui_Group_Item *item, Eina_Iterator *values, const char *pretext)
 {
    Outputter_Property_Value *value;
    Eina_Strbuf *displayed_value;
-   Eina_Iterator *values = property->values;
 
    displayed_value = eina_strbuf_new();
 
@@ -129,28 +128,46 @@ _fill_property_values(Efl_Ui_Group_Item *item, Outputter_Property *property)
      {
         Eo *o;
 
+        eina_strbuf_append(displayed_value, pretext);
         eina_strbuf_append(displayed_value, value->argument);
         eina_strbuf_append(displayed_value, " : ");
-        if (value->simple)
+        if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
           eina_strbuf_append_printf(displayed_value, "\"%s\"", value->value);
-        else
+        else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_STRUCT)
+          eina_strbuf_append(displayed_value, "Struct");
+        else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_NODE)
           eina_strbuf_append(displayed_value, "Object");
 
-        o = efl_add(EFL_UI_LIST_DEFAULT_ITEM_CLASS, item);
-        efl_text_set(o, eina_strbuf_string_get(displayed_value));
-        if (value->simple)
-          efl_event_callback_add(o, EFL_INPUT_EVENT_CLICKED, _change_argument_value_cb, value);
-        else
-          efl_event_callback_add(o, EFL_INPUT_EVENT_CLICKED, _push_node_cb, value->object);
-        efl_pack_end(item, o);
+        if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
+          {
+             o = efl_add(EFL_UI_LIST_DEFAULT_ITEM_CLASS, item);
+             efl_text_set(o, eina_strbuf_string_get(displayed_value));
+             efl_event_callback_add(o, EFL_INPUT_EVENT_CLICKED, _change_argument_value_cb, value);
+             efl_pack_end(item, o);
+          }
+        else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_STRUCT)
+          {
+             Eina_Strbuf *buf = eina_strbuf_new();
+             eina_strbuf_append(buf, value->argument);
+             eina_strbuf_append(buf, ".");
+             _fill_property_values(item, value->str->values, eina_strbuf_string_get(buf));
+             eina_strbuf_free(buf);
+          }
+        else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_NODE)
+          {
+             o = efl_add(EFL_UI_LIST_DEFAULT_ITEM_CLASS, item);
+             efl_text_set(o, eina_strbuf_string_get(displayed_value));
+             efl_event_callback_add(o, EFL_INPUT_EVENT_CLICKED, _push_node_cb, value->object);
+             efl_pack_end(item, o);
+          }
 
         eina_strbuf_reset(displayed_value);
         //if this property is a object, update its stack
-        if (!value->simple)
+        if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_NODE)
           _local_stack_update(value->object, outputter_node_get(value->object));
      }
    eina_strbuf_free(displayed_value);
-   eina_iterator_free(property->values);
+   eina_iterator_free(values);
 }
 
 static void
@@ -171,7 +188,7 @@ properties_flush(Local_Stack *data)
         efl_key_data_set(item_data->delete, "__name", prop_name);
         efl_text_set(item_data->root, prop_name);
         efl_pack_end(data->data->properties, item_data->root);
-        _fill_property_values(item_data->root, property);
+        _fill_property_values(item_data->root, property->values, "");
         free(item_data);
      }
    eina_iterator_free(properties);

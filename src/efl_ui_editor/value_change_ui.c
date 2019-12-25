@@ -17,7 +17,13 @@ struct _Value_Selection {
 };
 
 static void
-_fetch_range_cb(Value_Selection *v, Eina_Strbuf *buf)
+_fetch_int_range_cb(Value_Selection *v, Eina_Strbuf *buf)
+{
+   eina_strbuf_append_printf(buf, "%d", (int)efl_ui_range_value_get(v->selector));
+}
+
+static void
+_fetch_float_range_cb(Value_Selection *v, Eina_Strbuf *buf)
 {
    eina_strbuf_append_printf(buf, "%f", efl_ui_range_value_get(v->selector));
 }
@@ -87,7 +93,7 @@ change_value(Outputter_Property_Value *value, Eo *anchor_widget)
         selection->popup = data->root;
         selection->set = data->ok;
         selection->selector = data->range_selector;
-        selection->get_value = _fetch_range_cb;
+        selection->get_value = _fetch_int_range_cb;
         efl_ui_range_value_set(data->range_selector, atoi(value->value));
      }
    else if (btype >= EOLIAN_TYPE_BUILTIN_FLOAT && btype <= EOLIAN_TYPE_BUILTIN_DOUBLE)
@@ -96,7 +102,7 @@ change_value(Outputter_Property_Value *value, Eo *anchor_widget)
         selection->popup = data->root;
         selection->set = data->ok;
         selection->selector = data->range_selector;
-        selection->get_value = _fetch_range_cb;
+        selection->get_value = _fetch_float_range_cb;
         efl_ui_range_value_set(data->range_selector, atof(value->value));
      }
    else if (btype == EOLIAN_TYPE_BUILTIN_BOOL)

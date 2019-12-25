@@ -146,6 +146,9 @@ int main(int argc, char const *argv[])
 
    ui = efl_ui_format_parse(input_content);
 
+   if (!ui)
+     exit(-1);
+
    if (!validate(state, ui))
      exit(-1);
 

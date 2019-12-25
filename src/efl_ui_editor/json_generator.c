@@ -34,6 +34,47 @@ _print_children(Json_Context *ctx, Outputter_Node *node, enum Efl_Ui_Node_Childr
   eina_iterator_free(children);
 }
 
+static void
+_output_property_values(Json_Context *ctx, Eina_Strbuf *values, Eina_Iterator *property_values, Eina_Bool *force_array)
+{
+   int i = 0;
+   Outputter_Property_Value *value;
+
+   *force_array = EINA_FALSE;
+
+   EINA_ITERATOR_FOREACH(property_values, value)
+     {
+        if (i > 0)
+          eina_strbuf_append(values, ", ");
+        if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
+          {
+             eina_strbuf_append(values, value->value);
+          }
+        else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_STRUCT)
+          {
+             Eina_Bool b;
+             Eina_Strbuf *buf = eina_strbuf_new();
+
+             eina_strbuf_append(buf, "[");
+             _output_property_values(ctx, buf, value->str->values, &b);
+             eina_strbuf_append(buf, "]");
+             eina_strbuf_append_buffer(values, buf);
+             eina_strbuf_free(buf);
+             *force_array = EINA_TRUE;
+          }
+        else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_NODE)
+          {
+             Eina_Strbuf *buf = _output_node(ctx, value->object, NULL);
+             eina_strbuf_append_buffer(values, buf);
+             eina_strbuf_free(buf);
+          }
+        i++;
+     }
+   if (i > 1)
+     *force_array = EINA_TRUE;
+   eina_iterator_free(property_values);
+}
+
 static Eina_Strbuf*
 _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
 {
@@ -70,39 +111,21 @@ _output_node(Json_Context *ctx, Outputter_Node *n, Outputter_Child *thischild)
           }
 
      }
-
    //handle properties
    Outputter_Property *property;
    Eina_Iterator *properties = outputter_properties_get(n);
    EINA_ITERATOR_FOREACH(properties, property)
      {
-        Outputter_Property_Value *value;
         Eina_Strbuf *values = eina_strbuf_new();
-        int i = 0;
+        Eina_Bool force_array = EINA_FALSE;
 
         eina_strbuf_append_printf(current_object, "  \"%s\" : ", eolian_function_name_get(property->property));
 
-        EINA_ITERATOR_FOREACH(property->values, value)
-          {
-             if (i > 0)
-               eina_strbuf_append(values, ", ");
-             if (value->simple)
-               {
-                  eina_strbuf_append(values, value->value);
-               }
-             else
-               {
-                  Eina_Strbuf *buf = _output_node(ctx, value->object, NULL);
-                  eina_strbuf_append_buffer(values, buf);
-                  eina_strbuf_free(buf);
-               }
-             i++;
-          }
-        eina_iterator_free(property->values);
-        if (i > 1)
+        _output_property_values(ctx, values, property->values, &force_array);
+        if (force_array)
           eina_strbuf_append(current_object, "[");
         eina_strbuf_append_buffer(current_object, values);
-        if (i > 1)
+        if (force_array)
           eina_strbuf_append(current_object, "]");
         eina_strbuf_free(values);
         eina_strbuf_append(current_object, ",\n");

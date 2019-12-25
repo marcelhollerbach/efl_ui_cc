@@ -67,6 +67,8 @@ next_pair(char **key, char **value, jsmntype_t *type, int *return_pos, int max_p
    return T_OK;
 }
 
+static Eina_Bool parse_ui_struct(Efl_Ui_Struct *str, int last_pos);
+
 static inline Eina_Bool
 handle_property_value(Efl_Ui_Property_Value *v, char *value, jsmntype_t type, int last_pos)
 {
@@ -90,13 +92,43 @@ handle_property_value(Efl_Ui_Property_Value *v, char *value, jsmntype_t type, in
      }
    else if (type == JSMN_ARRAY)
      {
-        printf("TODO\n");
+        Efl_Ui_Struct *str;
+
+        str = property_value_struct(v);
+        if (!parse_ui_struct(str, last_pos))
+          return EINA_FALSE;
      }
    else
      {
         printf("Error, Unexpected type\n");
         return EINA_FALSE;
      }
+   return EINA_TRUE;
+}
+
+static Eina_Bool
+parse_ui_struct(Efl_Ui_Struct *str, int return_pos)
+{
+   int last_pos = 0;
+   char *value;
+   jsmntype_t type;
+
+   while(1)
+     {
+        Efl_Ui_Property_Value *v;
+
+        if (next_token(&value, &type, &last_pos, return_pos) < 0)
+          break;
+
+        v = property_struct_value_append(str);
+
+        if (!handle_property_value(v, value, type, last_pos))
+          return EINA_FALSE;
+
+        free(value);
+        value = NULL;
+     }
+
    return EINA_TRUE;
 }
 

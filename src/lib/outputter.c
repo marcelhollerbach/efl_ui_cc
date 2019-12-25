@@ -2,8 +2,13 @@
 #include "Internal.h"
 #include "abstract_tree_private.h"
 
+typedef void (*Value_Transform)(const Eolian_Type *etype, Eina_Strbuf *buf, const char *value);
+
+
+static void _free_property_values(Outputter_Property_Value *value);
+
 struct _Outputter_Node {
-   void (*value_transform)(const Eolian_Type *etype, Eina_Strbuf *buf, const char *value);
+   Value_Transform value_transform;
    const Eolian_Class *klass;
    Eolian_State *s;
    Efl_Ui_Node *node;
@@ -23,6 +28,11 @@ typedef struct {
    const Eolian_Type *type;
 } Inner_Outputter_Property_Value;
 
+typedef struct {
+   Outputter_Struct str;
+   Eina_Array *values;
+} Inner_Outputter_Struct;
+
 const Eolian_Class*
 outputter_node_klass_get(Outputter_Node *node)
 {
@@ -40,12 +50,63 @@ create_outputter_node(Eolian_State *s, Efl_Ui_Node *content)
 {
    Outputter_Node *node = calloc(1, sizeof(Outputter_Node));
    EINA_SAFETY_ON_NULL_RETURN_VAL(s, NULL);
+   EINA_SAFETY_ON_NULL_RETURN_VAL(content, NULL);
    node->klass = find_klass(s, content->type);
    if (!node->klass)
      EINA_SAFETY_ON_NULL_RETURN_VAL(node->klass, NULL);
    node->node = content;
    node->s = s;
    return node;
+}
+
+static Inner_Outputter_Property_Value*
+_handle_property_value(Eolian_State *s, Value_Transform value_transform, Efl_Ui_Property_Value *val, const char *context_argument, const Eolian_Type *type)
+{
+   Inner_Outputter_Property_Value *value = calloc(1, sizeof(Inner_Outputter_Property_Value));
+   value->pvalue = val;
+   value->value.argument = context_argument; //eolian_parameter_name_get(parameter);
+   value->value.type = type; //eolian_parameter_type_get(parameter);
+   if (val->type == EFL_UI_PROPERTY_VALUE_TYPE_NODE)
+     {
+        value->value.node_type = EFL_UI_PROPERTY_VALUE_TYPE_NODE;
+        value->value.object = create_outputter_node(s, val->node);
+        value->value.object->value_transform = value_transform;
+     }
+   else if (val->type == EFL_UI_PROPERTY_VALUE_TYPE_STRUCT)
+     {
+        Inner_Outputter_Struct *str = calloc(1, sizeof(Inner_Outputter_Struct));
+
+        str->values = eina_array_new(10);
+        str->str.decl = eolian_type_typedecl_get(type);
+
+        {
+           Eolian_Struct_Type_Field *field;
+           Eina_Iterator *iter = eolian_typedecl_struct_fields_get(str->str.decl);
+           int i = 0;
+
+           EINA_ITERATOR_FOREACH(iter, field)
+             {
+                Efl_Ui_Property_Value *v = eina_array_data_get(val->str->fields, i);
+                Inner_Outputter_Property_Value *value = _handle_property_value(s, value_transform, v, eolian_typedecl_struct_field_name_get(field), eolian_typedecl_struct_field_type_get(field));
+                eina_array_push(str->values, value);
+                i ++;
+             }
+           eina_iterator_free(iter);
+           str->str.values = eina_array_iterator_new(str->values);
+        }
+        value->value.node_type = EFL_UI_PROPERTY_VALUE_TYPE_STRUCT;
+        value->value.str = (Outputter_Struct*)str;
+     }
+   else if (val->type == EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
+     {
+        Eina_Strbuf *buf = eina_strbuf_new();
+        value->value.node_type = EFL_UI_PROPERTY_VALUE_TYPE_VALUE;
+        value_transform(value->value.type, buf, val->value);
+        if (eina_strbuf_length_get(buf) == 0)
+          eina_strbuf_append(buf, val->value);
+        value->value.value = eina_strbuf_release(buf);
+     }
+   return value;
 }
 
 static void
@@ -58,27 +119,9 @@ _outputter_properties_values_fill(Outputter_Node *node, Inner_Outputter_Property
    EINA_ITERATOR_FOREACH(parameters, parameter)
      {
         Efl_Ui_Property_Value *val = eina_array_data_get(prop->value, i);
-        Inner_Outputter_Property_Value *value = calloc(1, sizeof(Inner_Outputter_Property_Value));
-        value->pvalue = val;
-        value->value.argument = eolian_parameter_name_get(parameter);
-        value->value.type = eolian_parameter_type_get(parameter);
-        if (val->is_node)
-          {
-             value->value.simple = EINA_FALSE;
-             value->value.object = create_outputter_node(node->s, val->node);
-             value->value.object->value_transform = node->value_transform;
-          }
-        else
-          {
-             Eina_Strbuf *buf = eina_strbuf_new();
-             value->value.simple = EINA_TRUE;
-
-             //value->value.value = _fetch_real_value(parameter, val->value);
-             node->value_transform(value->value.type, buf, val->value);
-             if (eina_strbuf_length_get(buf) == 0)
-               eina_strbuf_append(buf, val->value);
-             value->value.value = eina_strbuf_release(buf);
-          }
+        Inner_Outputter_Property_Value *value = _handle_property_value(node->s, node->value_transform, val,
+                                                                        eolian_parameter_name_get(parameter),
+                                                                        eolian_parameter_type_get(parameter));
         eina_array_push(iprop->values, value);
         i ++;
      }
@@ -203,6 +246,18 @@ outputter_node_init(Eolian_State *s, Efl_Ui* ui, const char **name, void (*value
 }
 
 static void
+_outputter_struct_free(Inner_Outputter_Struct *str)
+{
+   while (eina_array_count(str->values) > 0)
+     {
+        Outputter_Property_Value *value = eina_array_pop(str->values);
+        _free_property_values(value);
+     }
+   eina_array_free(str->values);
+   free(str);
+}
+
+static void
 _outputter_node_free(Outputter_Node *node)
 {
    while (node->children && eina_array_count(node->children))
@@ -221,23 +276,32 @@ _outputter_node_free(Outputter_Node *node)
         while(eina_array_count(prop->values))
           {
             Outputter_Property_Value *value = eina_array_pop(prop->values);
-
-            if (!value->simple)
-              {
-                 _outputter_node_free(value->object);
-              }
-            else
-              {
-                 if (value->value)
-                   free((char*)value->value);
-              }
-            free(value);
+            _free_property_values(value);
           }
         eina_array_free(prop->values);
         free(prop);
      }
    eina_array_free(node->properties);
    free(node);
+}
+
+static void
+_free_property_values(Outputter_Property_Value *value)
+{
+   if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_NODE)
+     {
+        _outputter_node_free(value->object);
+     }
+   else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_STRUCT)
+     {
+        _outputter_struct_free((Inner_Outputter_Struct*)value->str);
+     }
+   else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
+     {
+        if (value->value)
+          free((char*)value->value);
+     }
+   free(value);
 }
 
 void

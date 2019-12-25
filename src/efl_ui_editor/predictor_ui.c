@@ -65,8 +65,7 @@ select_available_types(void)
    EINA_SAFETY_ON_FALSE_RETURN_VAL(efl_key_data_get(data->root, "__promise") == NULL, NULL);
    efl_key_data_set(data->root, "__promise", ctx);
 
-   Eo *container = efl_content_get(data->root);
-   efl_ui_multi_selectable_all_unselect(container);
+   efl_ui_multi_selectable_all_unselect(data->container);
    efl_gfx_entity_visible_set(data->root, EINA_TRUE);
 
    return eina_future_new(ctx);
