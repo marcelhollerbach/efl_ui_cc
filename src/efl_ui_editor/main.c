@@ -10,6 +10,8 @@
 Eolian_State *editor_state = NULL;
 Eina_Bool beta_support = EINA_FALSE;
 Eina_Bool test_mode = EINA_FALSE;
+Eina_Bool format_mode = EINA_FALSE;
+const char *output_file = NULL;
 Efl_Ui_Win *win;
 
 static void
@@ -40,17 +42,31 @@ efl_main(void *data EINA_UNUSED, const Efl_Event *ev EINA_UNUSED)
           {
              test_mode = EINA_TRUE;
           }
+        else if (!strcmp(argument, "--format"))
+          {
+             format_mode = EINA_TRUE;
+          }
         else if (!strcmp(argument, "-I"))
           {
-             if (!access(argument, F_OK))
+             const char *include_dir = NULL;
+
+             c++;
+             eina_accessor_data_get(cma, c, (void**)&include_dir);
+
+             if (!access(include_dir, F_OK))
                {
-                  eolian_state_directory_add(editor_state, argument);
+                  eolian_state_directory_add(editor_state, include_dir);
                }
              else
                {
-                  printf("Directory %s cannot be accessed!\n", argument);
+                  printf("Directory %s cannot be accessed!\n", include_dir);
                   abort();
                }
+          }
+        else if (!strcmp(argument, "-o"))
+          {
+             c++;
+             eina_accessor_data_get(cma, c, (void**)&output_file);
           }
         else if (!input_file)
           {
@@ -105,11 +121,21 @@ efl_main(void *data EINA_UNUSED, const Efl_Event *ev EINA_UNUSED)
         eina_log_abort_on_critical_set(EINA_TRUE);
         efl_event_callback_add(win, EFL_CANVAS_SCENE_EVENT_RENDER_POST, _exit_cb, NULL);
      }
-   predictor_init(editor_state);
-   base_ui_init(win);
-   display_ui_init(win);
-   file_set(input_file);
-   efl_gfx_entity_size_set(win, EINA_SIZE2D(600, 400));
-
+   else if (format_mode)
+     {
+        base_ui_init(win);
+        display_ui_init(win);
+        file_set(input_file, output_file ? output_file : input_file);
+        safe_file();
+        efl_loop_quit(efl_main_loop_get(), eina_value_int_init(0));
+     }
+   else
+     {
+        predictor_init(editor_state);
+        base_ui_init(win);
+        display_ui_init(win);
+        file_set(input_file, output_file ? output_file : input_file);
+        efl_gfx_entity_size_set(win, EINA_SIZE2D(600, 400));
+     }
 }
 EFL_MAIN()

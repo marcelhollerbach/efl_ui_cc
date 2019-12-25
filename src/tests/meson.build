@@ -3,6 +3,9 @@ tests = ['testcase1', 'testcase2', 'testcase3', 'testcase4', 'testcase5', 'testc
 env = environment()
 env.set('TEST_IN_TREE', '1')
 
+diff = find_program('diff')
+cp = find_program('cp')
+
 foreach test : tests
   gen_files = custom_target(test+'_gen',
     input: test+'.eflui',

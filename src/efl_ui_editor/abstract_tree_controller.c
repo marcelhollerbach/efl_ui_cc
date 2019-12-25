@@ -4,7 +4,7 @@
 #include "predictor.h"
 
 static Efl_Ui *ui_tree;
-static Eina_Stringshare *path = NULL;
+static Eina_Stringshare *input = NULL, *output = NULL;
 
 static void
 propagate_tree_change(void)
@@ -173,7 +173,7 @@ load_content(void)
    Eina_File *file;
    void *input_content;
 
-   file = eina_file_open(path, EINA_FALSE);
+   file = eina_file_open(input, EINA_FALSE);
    input_content = eina_file_map_all(file, EINA_FILE_SEQUENTIAL);
    ui_tree  = efl_ui_format_parse(input_content);
    if (!ui_tree) //empty file
@@ -190,29 +190,24 @@ load_content(void)
 }
 
 void
-file_set(const char *file)
+file_set(const char *input_file, const char *output_file)
 {
-   eina_stringshare_replace(&path, file);
+   eina_stringshare_replace(&input, input_file);
+   eina_stringshare_replace(&output, output_file);
    load_content();
 }
 
 void
 safe_file(void)
 {
-   //just a hack because i dont trust it yet that much
-   Eina_Strbuf *new_file_name = eina_strbuf_new();
-   eina_strbuf_append(new_file_name, path);
-   eina_strbuf_append(new_file_name, ".new");
-   char *file_path = eina_strbuf_release(new_file_name);
-
    EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
    char *json = json_output(editor_state, ui_tree);
    EINA_SAFETY_ON_NULL_RETURN(json);
 
-   FILE *f = fopen(file_path, "w+");
+   FILE *f = fopen(output, "w+");
    if (!f)
      {
-        printf("Failed to open file at %s\n", file_path);
+        printf("Failed to open file at %s\n", output);
         return;
      }
    if (!fwrite(json, strlen(json), 1, f))
@@ -222,5 +217,5 @@ safe_file(void)
      }
    fclose(f);
 
-   printf("File stored in %s\n", file_path);
+   printf("File stored in %s\n", output);
 }

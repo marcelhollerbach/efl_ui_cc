@@ -26,7 +26,7 @@ void add_property(Efl_Ui_Node *node, const char *property_name);
 void del_property(Efl_Ui_Node *node, const char *prop_name);
 void change_parameter_type(Efl_Ui_Property_Value *value, const char *v);
 void change_id(Efl_Ui_Node *node, const char *new_id);
-void file_set(const char *file);
+void file_set(const char *input_file, const char *output_file);
 void safe_file(void);
 
 //UIs for selecting Types and properties
