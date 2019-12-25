@@ -54,7 +54,7 @@ validate_builtin_property_values(const Validator_Context *ctx, const Eolian_Type
 
    if (!value)
      {
-        ERROR_OUT(ctx, "Values are NULL");
+        ERROR_OUT(ctx, "Values are NULL\n");
      }
 
    if (builtin >= EOLIAN_TYPE_BUILTIN_BYTE && builtin <= EOLIAN_TYPE_BUILTIN_PTRDIFF)
@@ -62,7 +62,7 @@ validate_builtin_property_values(const Validator_Context *ctx, const Eolian_Type
         char *tmp_end;
         if (value->is_node)
           {
-            ERROR_OUT(ctx, "Expected a number");
+            ERROR_OUT(ctx, "Expected a number\n");
           }
         strtol(value->value, &tmp_end, 10);
         if (errno == EINVAL || errno == ERANGE || tmp_end != value->value + strlen(value->value))
@@ -75,7 +75,7 @@ validate_builtin_property_values(const Validator_Context *ctx, const Eolian_Type
         char *tmp_end;
         if (value->is_node)
           {
-            ERROR_OUT(ctx, "Expected a float");
+            ERROR_OUT(ctx, "Expected a float\n");
           }
         strtof(value->value, &tmp_end);
         if (errno == ERANGE || tmp_end != value->value + strlen(value->value))
@@ -88,7 +88,7 @@ validate_builtin_property_values(const Validator_Context *ctx, const Eolian_Type
      {
         if (value->is_node)
           {
-            ERROR_OUT(ctx, "Expected true or false");
+            ERROR_OUT(ctx, "Expected true or false\n");
           }
         if (!eina_streq(value->value, "true") && !eina_streq(value->value, "false"))
           {
@@ -99,7 +99,7 @@ validate_builtin_property_values(const Validator_Context *ctx, const Eolian_Type
      {
         if (value->is_node)
           {
-            ERROR_OUT(ctx, "Expected a String");
+            ERROR_OUT(ctx, "Expected a String\n");
           }
      }
    else
@@ -183,7 +183,7 @@ validate_property(Validator_Context *ctx, const Eolian_Class *klass, Efl_Ui_Prop
                     {
                        if (!value)
                          {
-                            ERROR_OUT(ctx, "Value is NULL");
+                            ERROR_OUT(ctx, "Value is NULL\n");
                          }
                        if (!validate_builtin_property_values(ctx, type, value))
                          {
@@ -214,7 +214,7 @@ validate_property(Validator_Context *ctx, const Eolian_Class *klass, Efl_Ui_Prop
    eina_iterator_free(parameters);
    if (c != eina_array_count(node->value))
      {
-        ERROR_OUT(ctx, "Not enough arguments for property %s", node->key);
+        ERROR_OUT(ctx, "Not enough arguments for property %s\n", node->key);
      }
 
    return EINA_TRUE;
@@ -225,7 +225,7 @@ validate_klass(Validator_Context *ctx, const char *klass_name, const Eolian_Clas
 {
    if (!klass)
      {
-        ERROR_OUT(ctx, "type %s cannot be found", klass_name);
+        ERROR_OUT(ctx, "type %s cannot be found\n", klass_name);
      }
    return EINA_TRUE;
 }
@@ -235,11 +235,11 @@ validate_part_name(Validator_Context *ctx, Efl_Ui_Pack_Pack *pack, Eina_Hash *pa
 {
    if (!pack->part_name)
      {
-        ERROR_OUT(ctx, "Part name required");
+        ERROR_OUT(ctx, "Part name required\n");
      }
    if (eina_hash_find(part_names, &pack->part_name))
      {
-        ERROR_OUT(ctx, "Part name %s is duplicated", pack->part_name);
+        ERROR_OUT(ctx, "Part name %s is duplicated\n", pack->part_name);
      }
    eina_hash_add(part_names, &pack->part_name, pack);
    return EINA_TRUE;
@@ -312,10 +312,10 @@ validate_node(Validator_Context *ctx, Efl_Ui_Node *node, const char *placment_co
              char buffer[100];
 
              if (table->h <= 0)
-               ERROR_OUT(ctx, "Height cannot be 0");
+               ERROR_OUT(ctx, "Height cannot be 0\n");
 
              if (table->w <= 0)
-               ERROR_OUT(ctx, "Width cannot be 0");
+               ERROR_OUT(ctx, "Width cannot be 0\n");
 
              snprintf(buffer, sizeof(buffer), "at position (%s, %s, %s, %s)", table->x, table->y, table->w, table->h);
              if (!validate_node(ctx, table->basic.node, buffer))

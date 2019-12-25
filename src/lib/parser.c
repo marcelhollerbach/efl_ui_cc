@@ -88,9 +88,13 @@ handle_property_value(Efl_Ui_Property_Value *v, char *value, jsmntype_t type, in
      {
         property_value_value(v, value);
      }
+   else if (type == JSMN_ARRAY)
+     {
+        printf("TODO\n");
+     }
    else
      {
-        printf("Error, Unexpected type");
+        printf("Error, Unexpected type\n");
         return EINA_FALSE;
      }
    return EINA_TRUE;
