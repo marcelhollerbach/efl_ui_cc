@@ -40,6 +40,7 @@ next_token(char **value, jsmntype_t *type, int *return_pos, int max_pos)
    if (*return_pos >= max_pos)
      {
         free(*value);
+        *value = NULL;
         return T_POP_SCOPE;
      }
    tokens_current_pos ++;
@@ -53,12 +54,16 @@ next_pair(char **key, char **value, jsmntype_t *type, int *return_pos, int max_p
    int tmp_returnpos;
    Token_Result res;
 
+   *key = NULL;
+   *value = NULL;
+
    res = next_token(key, &tmpt, &tmp_returnpos, max_pos);
    if (res < 0)
      return res;
-   next_token(value, type, return_pos, max_pos);
+   res = next_token(value, type, return_pos, max_pos);
    if (res < 0)
      return res;
+
    return T_OK;
 }
 
@@ -69,7 +74,8 @@ handle_property_value(Efl_Ui_Property_Value *v, char *value, jsmntype_t type, in
      {
         Efl_Ui_Node *n;
         n = property_value_node(v);
-        parse_ui_element(n, last_pos, NULL, NULL);
+        if (!parse_ui_element(n, last_pos, NULL, NULL))
+          return EINA_FALSE;
      }
    else if (type == JSMN_STRING)
      {
@@ -258,7 +264,11 @@ parse_ui_element(Efl_Ui_Node *node, int return_pos, Custom_Handler custom_handle
    char *key, *value;
    jsmntype_t type;
 
-   next_pair(&key, &value, &type, &last_pos, return_pos);
+   if (next_pair(&key, &value, &type, &last_pos, return_pos) < 0)
+     {
+        printf("Error: First token has to be \"type\" but it couldnt be fetched\n");
+        return EINA_FALSE;
+     }
 
    //ensure that the first key is always the type
    if (!eina_streq(key, "type"))
@@ -279,7 +289,11 @@ parse_ui_element(Efl_Ui_Node *node, int return_pos, Custom_Handler custom_handle
    while(1)
      {
         if (next_pair(&key, &value, &type, &last_pos, return_pos) < 0)
-          break;
+          {
+             key = NULL;
+             value = NULL;
+             break;
+          }
 
         if (custom_handler && custom_handler(data, key, value))
           goto end;
