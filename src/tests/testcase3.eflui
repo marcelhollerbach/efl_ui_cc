@@ -1,15 +1,14 @@
 {
   "ui-name" : "testcase",
-  "ui-content" : {
-    "type": "Efl.Ui.Button",
+  "ui-content" :   {
+    "type" : "Efl.Ui.Button",
     "id" : "basic",
-    "content" :
-      {
-        "type" : "Efl.Ui.Image",
-        "file" : "cool-file.png",
-        "id" : "img",
-        "hint_align" : [0.0, 1.0],
-      },
-    "text": "test",
+    "content" :   {
+     "type" : "Efl.Ui.Image",
+     "id" : "img",
+     "file" : "cool-file.png",
+     "hint_align" : [0.0, 1.0],
    },
+    "text" : "test",
+  }
 }

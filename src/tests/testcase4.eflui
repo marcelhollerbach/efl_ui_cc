@@ -1,25 +1,25 @@
 {
   "ui-name" : "testcase",
-  "ui-content" : {
-    "type": "Efl.Ui.Box",
+  "ui-content" :   {
+    "type" : "Efl.Ui.Box",
     "id" : "basic",
     "pack-linear" : [
       {
-        "type" : "Efl.Ui.Image",
-        "file" : "cool-file.png",
-        "id" : "img",
-        "hint_align" : [0.0, 1.0],
-      },
+       "type" : "Efl.Ui.Image",
+       "id" : "img",
+       "file" : "cool-file.png",
+       "hint_align" : [0.0, 1.0],
+     },
       {
-        "type" : "Efl.Ui.Button",
-        "id" : "btn",
-        "text" : "!!--??",
-      },
+       "type" : "Efl.Ui.Button",
+       "id" : "btn",
+       "text" : "!!--??",
+     },
       {
-        "type" : "Efl.Ui.Check",
-        "id" : "txt",
-        "text" : "And here we go!",
-      },
+       "type" : "Efl.Ui.Check",
+       "id" : "txt",
+       "text" : "And here we go!",
+     }
     ],
-   },
+  }
 }

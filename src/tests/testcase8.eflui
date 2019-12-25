@@ -1,51 +1,51 @@
 {
   "ui-name" : "testcase",
-  "ui-content" : {
-    "type": "Efl.Ui.List",
+  "ui-content" :   {
+    "type" : "Efl.Ui.List",
     "id" : "basic",
     "orientation" : horizontal,
     "pack-linear" : [
       {
-        "type" : "Efl.Ui.List_Default_Item",
-        "text" : "Alpha",
-      },
+       "type" : "Efl.Ui.List_Default_Item",
+       "text" : "Alpha",
+     },
       {
-        "type" : "Efl.Ui.List_Default_Item",
-        "text" : "Beta",
-      },
+       "type" : "Efl.Ui.List_Default_Item",
+       "text" : "Beta",
+     },
       {
-        "type" : "Efl.Ui.List_Default_Item",
-        "text" : "Gamma",
-      },
+       "type" : "Efl.Ui.List_Default_Item",
+       "text" : "Gamma",
+     },
       {
-        "type" : "Efl.Ui.List_Default_Item",
-        "text" : "Xi",
-      },
+       "type" : "Efl.Ui.List_Default_Item",
+       "text" : "Xi",
+     },
       {
-        "type" : "Efl.Ui.List_Default_Item",
-        "text" : "Delta",
-      },
+       "type" : "Efl.Ui.List_Default_Item",
+       "text" : "Delta",
+     }
     ],
     "pack-part" : [
       {
-        "type" : "Efl.Ui.Image",
-        "file" : "cool-file.png",
-        "id" : "img",
-        "part" : "asdf",
-        "hint_align" : [0.0, 1.0],
-      },
+       "type" : "Efl.Ui.Image",
+       "id" : "img",
+       "part" : "asdf",
+       "file" : "cool-file.png",
+       "hint_align" : [0.0, 1.0],
+     },
       {
-        "type" : "Efl.Ui.Button",
-        "id" : "btn",
-        "part" : "asdf2",
-        "text" : "!!--??",
-      },
+       "type" : "Efl.Ui.Button",
+       "id" : "btn",
+       "part" : "asdf2",
+       "text" : "!!--??",
+     },
       {
-        "type" : "Efl.Ui.Check",
-        "id" : "txt",
-        "part" : "asdf3",
-        "text" : "And here we go!",
-      },
+       "type" : "Efl.Ui.Check",
+       "id" : "txt",
+       "part" : "asdf3",
+       "text" : "And here we go!",
+     }
     ],
-   },
+  }
 }

@@ -1,8 +1,8 @@
 {
   "ui-name" : "testcase",
-  "ui-content" : {
-    "type": "Efl.Ui.Button",
+  "ui-content" :   {
+    "type" : "Efl.Ui.Button",
     "id" : "basic",
-    "text": "test",
-   },
+    "text" : "test",
+  }
 }
