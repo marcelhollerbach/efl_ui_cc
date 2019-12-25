@@ -18,7 +18,8 @@
               {
                 "type" : "Efl.Ui.Box",
                 "orientation" : horizontal,
-                "hint_weight" : [1.0, 0.1],
+                "hint_weight" : [1.0, 0.0],
+                "hint_size_min" : [[40, 40]],
                 "pack-linear" : [
                   {
                     "type" : "Efl.Ui.Button",
