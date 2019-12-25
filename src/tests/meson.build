@@ -30,6 +30,15 @@ foreach test : tests
     is_parallel: true,
     timeout: 30,
   )
+  format_target = custom_target('reformat_'+test,
+    input: test+'.eflui',
+    output : test+'o.eflui',
+    command: [editor, '--format', '-o', '@OUTPUT@', '@INPUT@'],
+  )
+  test('diff_calc_'+test, diff,
+    args : [join_paths(meson.current_build_dir(),test+'o.eflui'), join_paths(meson.current_source_dir(),test+'.eflui')],
+    depends : format_target,
+  )
 endforeach
 
 predictor = executable('predictor',
