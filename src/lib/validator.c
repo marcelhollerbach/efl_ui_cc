@@ -241,7 +241,11 @@ validate_property(Validator_Context *ctx, const Eolian_Class *klass, Efl_Ui_Prop
    f = find_function(ctx->s, klass, node->key);
    if (!f)
      {
-        ERROR_OUT(ctx, "Function %s not found\n", node->key);
+        ERROR_OUT(ctx, "Property %s not found\n", node->key);
+     }
+   if (!function_is_usable(f, eolian_function_type_get(f)))
+     {
+        ERROR_OUT(ctx, "Property cannot be used in the .eflui format\n");
      }
    parameters = eolian_property_values_get(f, EOLIAN_PROP_SET);
    int c = 0;

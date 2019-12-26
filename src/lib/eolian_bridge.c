@@ -71,8 +71,14 @@ find_function(Eolian_State *s, const Eolian_Class *klass, const char *prop)
         EINA_SAFETY_ON_FALSE_RETURN_VAL(is_allowed(EOLIAN_OBJECT(impl)), NULL);
 
         f = eolian_implement_function_get(impl, &type);
+
+        if (eina_streq(prop, "view_size"))
+          printf("----->%s %d\n", eolian_function_name_get(f), type);
+
         if (eina_streq(eolian_function_name_get(f), prop) && (type == EOLIAN_PROP_SET || type == EOLIAN_PROPERTY))
           {
+             if (eina_streq(prop, "view_size"))
+               printf("OK");
              return f;
           }
      }
@@ -174,6 +180,41 @@ _decl_is_valid(const Eolian_Typedecl *decl)
    return EINA_TRUE;
 }
 
+Eina_Bool
+function_is_usable(const Eolian_Function *f, const Eolian_Function_Type impl_func_type)
+{
+   if (!is_allowed(EOLIAN_OBJECT(f)))
+     return EINA_FALSE;
+
+   if ((impl_func_type != EOLIAN_PROP_SET && impl_func_type != EOLIAN_PROPERTY))
+     return EINA_FALSE;
+
+   Eina_Iterator *values = eolian_property_values_get(f, EOLIAN_PROP_SET);
+   Eolian_Function_Parameter *p;
+   EINA_ITERATOR_FOREACH(values, p)
+     {
+        if (!is_allowed(EOLIAN_OBJECT(p)))
+          {
+             eina_iterator_free(values);
+             return EINA_FALSE;
+          }
+        const Eolian_Type *type = eolian_parameter_type_get(p);
+        const Eolian_Typedecl *decl = eolian_type_typedecl_get(type);
+        fetch_real_typedecl(&decl, &type);
+        const Eolian_Type_Builtin_Type btype = eolian_type_builtin_type_get(type);
+        const Eolian_Class *klass = eolian_type_class_get(type);
+        if (!_buildin_is_valid(btype) &&
+            !_decl_is_valid(decl) &&
+            klass == NULL)
+          {
+             eina_iterator_free(values);
+             return EINA_FALSE;
+          }
+     }
+   eina_iterator_free(values);
+   return EINA_TRUE;
+}
+
 Eina_Array*
 find_all_properties(Eolian_State *state, const char *klass_name)
 {
@@ -196,44 +237,13 @@ find_all_properties(Eolian_State *state, const char *klass_name)
      {
         Eolian_Function_Type type;
         const Eolian_Function *f;
-        Eina_Bool use = EINA_TRUE;
 
         if (!is_allowed(EOLIAN_OBJECT(impl)))
           continue;
 
         f = eolian_implement_function_get(impl, &type);
 
-        if (!is_allowed(EOLIAN_OBJECT(f)))
-          continue;
-
-        if ((type != EOLIAN_PROP_SET && type != EOLIAN_PROPERTY))
-          continue;
-
-        Eina_Iterator *values = eolian_property_values_get(f, EOLIAN_PROP_SET);
-        Eolian_Function_Parameter *p;
-        EINA_ITERATOR_FOREACH(values, p)
-          {
-             if (!is_allowed(EOLIAN_OBJECT(impl)))
-               {
-                  use = EINA_FALSE;
-                  continue;
-               }
-             const Eolian_Type *type = eolian_parameter_type_get(p);
-             const Eolian_Typedecl *decl = eolian_type_typedecl_get(type);
-             fetch_real_typedecl(&decl, &type);
-             const Eolian_Type_Builtin_Type btype = eolian_type_builtin_type_get(type);
-             const Eolian_Class *klass = eolian_type_class_get(type);
-
-             if (!_buildin_is_valid(btype) &&
-                 !_decl_is_valid(decl) &&
-                 klass == NULL)
-               {
-                  use = EINA_FALSE;
-                  continue;
-               }
-          }
-        eina_iterator_free(values);
-        if (!use)
+        if (!function_is_usable(f, type))
           continue;
 
         //deduplication
@@ -261,8 +271,8 @@ find_all_arguments(Eolian_State *state, const char *klass_name, const char *prop
    EINA_SAFETY_ON_FALSE_RETURN_VAL(eolian_class_type_get(klass) == EOLIAN_CLASS_REGULAR, NULL);
    EINA_SAFETY_ON_FALSE_RETURN_VAL(is_allowed(EOLIAN_OBJECT(klass)), NULL);
    f = find_function(state, klass, property);
-   EINA_SAFETY_ON_FALSE_RETURN_VAL(is_allowed(EOLIAN_OBJECT(f)), NULL);
    EINA_SAFETY_ON_NULL_RETURN_VAL(f, NULL);
+   EINA_SAFETY_ON_FALSE_RETURN_VAL(is_allowed(EOLIAN_OBJECT(f)), NULL);
    iter = eolian_property_values_get(f, EOLIAN_PROP_SET);
    result = eina_array_new(10);
 
