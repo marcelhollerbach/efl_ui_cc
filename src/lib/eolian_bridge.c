@@ -193,6 +193,7 @@ find_all_properties(Eolian_State *state, const char *klass_name)
           eina_array_push(result, f);
      }
    eina_list_free(functions);
+
    return result;
 }
 

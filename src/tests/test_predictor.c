@@ -46,7 +46,7 @@ START_TEST(test_predictor_properties)
      {
         properties++;
      }
-   ck_assert_int_ge(properties, 123);
+   ck_assert_int_ge(properties, 59);
 
 }
 END_TEST
