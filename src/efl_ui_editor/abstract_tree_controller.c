@@ -3,7 +3,6 @@
 #include "Internal.h"
 #include "predictor.h"
 
-static Efl_Ui *ui_tree;
 static Eina_Stringshare *input = NULL, *output = NULL;
 
 static void
@@ -34,6 +33,7 @@ change_type(Efl_Ui_Node *node, const char *type)
 
    while(eina_array_count(stack) > 0)
      node_property_remove(node, eina_array_pop(stack));
+   eina_array_free(stack);
 
    if ((available & EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR) == 0)
      node_delete_children(node, EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR);
@@ -69,6 +69,8 @@ add_child(Efl_Ui_Node *node, const char *klass_name, enum Efl_Ui_Node_Children_T
         case EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE: {
           Efl_Ui_Pack_Table *table = node_pack_table_node_append(node);
           new_node = table->basic.node;
+          table->x = table->y = "0";
+          table->w = table->h = "1";
         }
         break;
         default:
@@ -92,9 +94,11 @@ del_child(Efl_Ui_Node *node, Efl_Ui_Node *child)
 static void
 _insert_values(const Eolian_Type *etype, Efl_Ui_Property_Value *value)
 {
-   const Eolian_Type_Builtin_Type btype = eolian_type_builtin_type_get(etype);
-   const Eolian_Class *klass = eolian_type_class_get(etype);
+   const Eolian_Type *type = etype;
    const Eolian_Typedecl *decl = eolian_type_typedecl_get(etype);
+   fetch_real_typedecl(&decl, &type);
+   const Eolian_Type_Builtin_Type btype = eolian_type_builtin_type_get(type);
+   const Eolian_Class *klass = eolian_type_class_get(type);
 
    if (klass)
      {
@@ -123,6 +127,7 @@ _insert_values(const Eolian_Type *etype, Efl_Ui_Property_Value *value)
         Eina_Iterator *fields = eolian_typedecl_enum_fields_get(decl);
         EINA_SAFETY_ON_FALSE_RETURN(eina_iterator_next(fields, (void**) &field));
         property_value_value(value, eolian_typedecl_enum_field_name_get(field));
+        eina_iterator_free(fields);
      }
    else if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_STRUCT)
      {

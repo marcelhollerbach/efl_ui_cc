@@ -174,7 +174,7 @@ node_child_remove(Efl_Ui_Node *node, Efl_Ui_Node *child)
    eina_array_remove(node->children_linear, _deletion_cb, child);
    eina_array_remove(node->children_table, _deletion_cb, child);
    eina_array_remove(node->children_part, _deletion_cb, child);
-   free(child);
+   efl_ui_node_free(child);
 }
 
 static void

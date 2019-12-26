@@ -8,6 +8,7 @@
 extern Eolian_State *editor_state;
 extern Efl_Ui_Win *win;
 extern Efl_Gfx_Entity *background;
+extern Efl_Ui *ui_tree;
 
 Efl_Ui_Widget* object_generator(Efl_Ui_Win *win, const Eolian_State *s, const Efl_Ui *ui);
 char*          json_output(const Eolian_State *s, const Efl_Ui *ui);

@@ -13,6 +13,7 @@ Eina_Bool test_mode = EINA_FALSE;
 Eina_Bool format_mode = EINA_FALSE;
 const char *output_file = NULL;
 Efl_Ui_Win *win;
+Efl_Ui *ui_tree;
 
 static void
 _exit_cb(void *data, const Efl_Event *ev)

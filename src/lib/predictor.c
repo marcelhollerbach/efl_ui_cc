@@ -82,6 +82,6 @@ get_available_property_details(Efl_Ui_Node *node, const char *property_name)
          details[i].type = type;
          details[i].name = eolian_parameter_name_get(param);
      }
-
+   eina_array_free(tmp_array);
    return details;
 }

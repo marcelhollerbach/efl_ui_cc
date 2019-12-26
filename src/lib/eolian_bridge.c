@@ -128,6 +128,7 @@ find_all_widgets(Eolian_State *state)
             is_allowed(EOLIAN_OBJECT(klass)))
           eina_array_push(result, klass);
      }
+   eina_iterator_free(it);
 
    return result;
 }
@@ -136,6 +137,39 @@ static Eina_Bool
 _search_cb(const void *container, void *data, void *fdata)
 {
    if (eina_streq(eolian_function_name_get(data), eolian_function_name_get(fdata)))
+     return EINA_FALSE;
+   return EINA_TRUE;
+}
+
+static Eina_Bool
+_buildin_is_valid(Eolian_Type_Builtin_Type builtin)
+{
+   if (builtin >= EOLIAN_TYPE_BUILTIN_BYTE && builtin <= EOLIAN_TYPE_BUILTIN_PTRDIFF)
+     {
+        return EINA_TRUE;
+     }
+   else if (builtin >= EOLIAN_TYPE_BUILTIN_FLOAT && builtin <= EOLIAN_TYPE_BUILTIN_DOUBLE)
+     {
+        return EINA_TRUE;
+     }
+   else if (builtin == EOLIAN_TYPE_BUILTIN_BOOL)
+     {
+        return EINA_TRUE;
+     }
+   else if (builtin >= EOLIAN_TYPE_BUILTIN_MSTRING && builtin <= EOLIAN_TYPE_BUILTIN_STRINGSHARE)
+     {
+        return EINA_TRUE;
+     }
+   return EINA_FALSE;
+}
+
+static Eina_Bool
+_decl_is_valid(const Eolian_Typedecl *decl)
+{
+   if (!decl)
+     return EINA_FALSE;
+   if (eolian_typedecl_type_get(decl) != EOLIAN_TYPEDECL_STRUCT &&
+        eolian_typedecl_type_get(decl) != EOLIAN_TYPEDECL_ENUM)
      return EINA_FALSE;
    return EINA_TRUE;
 }
@@ -184,7 +218,21 @@ find_all_properties(Eolian_State *state, const char *klass_name)
                   use = EINA_FALSE;
                   continue;
                }
+             const Eolian_Type *type = eolian_parameter_type_get(p);
+             const Eolian_Typedecl *decl = eolian_type_typedecl_get(type);
+             fetch_real_typedecl(&decl, &type);
+             const Eolian_Type_Builtin_Type btype = eolian_type_builtin_type_get(type);
+             const Eolian_Class *klass = eolian_type_class_get(type);
+
+             if (!_buildin_is_valid(btype) &&
+                 !_decl_is_valid(decl) &&
+                 klass == NULL)
+               {
+                  use = EINA_FALSE;
+                  continue;
+               }
           }
+        eina_iterator_free(values);
         if (!use)
           continue;
 
