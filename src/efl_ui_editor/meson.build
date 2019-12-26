@@ -33,3 +33,5 @@ editor = executable('efl_ui_editor',
   dependencies: [dependency('eolian'), dependency('efl-ui'), efl_ui_format, dependency('libffi'), dl],
   install: true,
 )
+
+editor_inc_dir = include_directories('.')

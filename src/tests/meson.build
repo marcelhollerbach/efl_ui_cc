@@ -3,6 +3,27 @@ tests = ['testcase1', 'testcase2', 'testcase3', 'testcase4', 'testcase5', 'testc
 env = environment()
 env.set('TEST_IN_TREE', '1')
 
+
+predictor = executable('predictor',
+  'test_predictor.c',
+  dependencies: [dependency('elementary'), dependency('eolian'), dependency('check'), efl_ui_format]
+)
+
+test('test_predictor', predictor,
+  is_parallel: true,
+)
+
+abstract_tree_controller = executable('abstract_tree_controller',
+  ['test_abstract_tree_controller.c',
+  join_paths(meson.source_root(),'src', 'efl_ui_editor', 'abstract_tree_controller.c')],
+  include_directories : editor_inc_dir,
+  dependencies: [dependency('elementary'), dependency('eolian'), dependency('check'), efl_ui_format]
+)
+
+test('test_abstract_tree_controller', abstract_tree_controller,
+  is_parallel: true,
+)
+
 diff = find_program('diff')
 cp = find_program('cp')
 
@@ -40,12 +61,3 @@ foreach test : tests
     depends : format_target,
   )
 endforeach
-
-predictor = executable('predictor',
-  'test_predictor.c',
-  dependencies: [dependency('elementary'), dependency('eolian'), dependency('check'), efl_ui_format]
-)
-
-test('test_predictor', predictor,
-  is_parallel: true,
-)

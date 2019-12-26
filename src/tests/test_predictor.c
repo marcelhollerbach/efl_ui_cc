@@ -6,11 +6,6 @@
 
 void setup(void)
 {
-   eolian_init();
-   Eolian_State *state = eolian_state_new();
-   eolian_state_system_directory_add(state);
-   eolian_bridge_beta_allowed_set(EINA_FALSE);
-   predictor_init(state);
 }
 
 void teardown(void)
@@ -94,6 +89,12 @@ int main(void)
     int number_failed;
     Suite *s;
     SRunner *sr;
+
+   eolian_init();
+   Eolian_State *state = eolian_state_new();
+   eolian_state_system_directory_add(state);
+   eolian_bridge_beta_allowed_set(EINA_FALSE);
+   predictor_init(state);
 
     s = predictor_suite();
     sr = srunner_create(s);
