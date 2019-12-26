@@ -95,7 +95,6 @@ select_available_types(void)
 
    efl_ui_multi_selectable_all_unselect(data->container);
    efl_gfx_entity_visible_set(data->root, EINA_TRUE);
-   efl_ui_focus_util_focus(data->container);
    efl_text_set(data->search_text, "");
    Efl_Event ev = {data->search_text, NULL, NULL};
    _text_changed_cb(data, &ev);
