@@ -154,15 +154,32 @@ find_all_properties(Eolian_State *state, const char *klass_name)
      {
         Eolian_Function_Type type;
         const Eolian_Function *f;
+        Eina_Bool use = EINA_TRUE;
 
         if (!is_allowed(EOLIAN_OBJECT(impl)))
           continue;
 
         f = eolian_implement_function_get(impl, &type);
-        if ((type == EOLIAN_PROP_SET || type == EOLIAN_PROPERTY))
+
+        if (!is_allowed(EOLIAN_OBJECT(f)))
+          continue;
+
+        if ((type != EOLIAN_PROP_SET && type != EOLIAN_PROPERTY))
+          continue;
+
+        Eina_Iterator *values = eolian_property_values_get(f, EOLIAN_PROP_SET);
+        Eolian_Function_Parameter *p;
+        EINA_ITERATOR_FOREACH(values, p)
           {
-             eina_array_push(result, f);
+             if (!is_allowed(EOLIAN_OBJECT(impl)))
+               {
+                  use = EINA_FALSE;
+                  continue;
+               }
           }
+        if (!use)
+          continue;
+        eina_array_push(result, f);
      }
    eina_list_free(functions);
    return result;
