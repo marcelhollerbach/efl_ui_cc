@@ -132,6 +132,14 @@ find_all_widgets(Eolian_State *state)
    return result;
 }
 
+static Eina_Bool
+_search_cb(const void *container, void *data, void *fdata)
+{
+   if (eina_streq(eolian_function_name_get(data), eolian_function_name_get(fdata)))
+     return EINA_FALSE;
+   return EINA_TRUE;
+}
+
 Eina_Array*
 find_all_properties(Eolian_State *state, const char *klass_name)
 {
@@ -179,7 +187,10 @@ find_all_properties(Eolian_State *state, const char *klass_name)
           }
         if (!use)
           continue;
-        eina_array_push(result, f);
+
+        //deduplication
+        if (eina_array_foreach(result, _search_cb, (void*)f))
+          eina_array_push(result, f);
      }
    eina_list_free(functions);
    return result;
