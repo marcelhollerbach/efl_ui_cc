@@ -31,7 +31,7 @@ find_klass(Eolian_State *s, const char *klass)
    if (!klass_hash)
      klass_hash = eina_hash_string_small_new(NULL);
 
-   k = eina_hash_find(klass_hash, &klass);
+   k = eina_hash_find(klass_hash, klass);
    if (k) return k;
 
    buf = eina_strbuf_new();
@@ -48,7 +48,7 @@ find_klass(Eolian_State *s, const char *klass)
    eina_strbuf_free(buf);
 
    k = eolian_state_class_by_name_get(s, klass);
-   eina_hash_add(klass_hash, &klass, k);
+   eina_hash_add(klass_hash, klass, k);
    return k;
 }
 
