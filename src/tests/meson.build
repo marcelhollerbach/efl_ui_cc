@@ -22,6 +22,7 @@ abstract_tree_controller = executable('abstract_tree_controller',
 
 test('test_abstract_tree_controller', abstract_tree_controller,
   is_parallel: true,
+  timeout: 60,
 )
 
 diff = find_program('diff')
