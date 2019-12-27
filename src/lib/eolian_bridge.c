@@ -68,17 +68,13 @@ find_function(Eolian_State *s, const Eolian_Class *klass, const char *prop)
         Eolian_Function_Type type;
         const Eolian_Function *f;
 
-        EINA_SAFETY_ON_FALSE_RETURN_VAL(is_allowed(EOLIAN_OBJECT(impl)), NULL);
-
         f = eolian_implement_function_get(impl, &type);
 
-        if (eina_streq(prop, "view_size"))
-          printf("----->%s %d\n", eolian_function_name_get(f), type);
+        if (!function_is_usable(f, type))
+          continue;
 
         if (eina_streq(eolian_function_name_get(f), prop) && (type == EOLIAN_PROP_SET || type == EOLIAN_PROPERTY))
           {
-             if (eina_streq(prop, "view_size"))
-               printf("OK");
              return f;
           }
      }
