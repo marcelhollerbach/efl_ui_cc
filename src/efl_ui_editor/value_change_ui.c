@@ -77,6 +77,39 @@ _close_cb(void *data, const Efl_Event *ev)
    free(v);
 }
 
+typedef struct {
+  Eolian_Type_Builtin_Type type;
+  size_t size;
+  Eina_Bool sign;
+} Numeric_Int_Ranges;
+
+#include <limits.h>
+
+Numeric_Int_Ranges ranges[] = {
+  {EOLIAN_TYPE_BUILTIN_BYTE, sizeof(char)*8, EINA_TRUE},
+  {EOLIAN_TYPE_BUILTIN_UBYTE, sizeof(char)*8, EINA_FALSE},
+  {EOLIAN_TYPE_BUILTIN_CHAR, sizeof(char)*8, EINA_TRUE},
+  {EOLIAN_TYPE_BUILTIN_SHORT, sizeof(short)*8, EINA_TRUE},
+  {EOLIAN_TYPE_BUILTIN_USHORT, sizeof(short)*8, EINA_FALSE},
+  {EOLIAN_TYPE_BUILTIN_INT, sizeof(int)*8, EINA_TRUE},
+  {EOLIAN_TYPE_BUILTIN_UINT, sizeof(int)*8, EINA_FALSE},
+  {EOLIAN_TYPE_BUILTIN_LONG, sizeof(long)*8, EINA_TRUE},
+  {EOLIAN_TYPE_BUILTIN_ULONG, sizeof(long)*8, EINA_FALSE},
+  {EOLIAN_TYPE_BUILTIN_LLONG, sizeof(long long)*8, EINA_TRUE},
+  {EOLIAN_TYPE_BUILTIN_ULLONG, sizeof(long long)*8, EINA_FALSE},
+  {EOLIAN_TYPE_BUILTIN_INT8, 8, EINA_TRUE},
+  {EOLIAN_TYPE_BUILTIN_UINT8, 8, EINA_FALSE},
+  {EOLIAN_TYPE_BUILTIN_INT16, 16, EINA_TRUE},
+  {EOLIAN_TYPE_BUILTIN_UINT16, 16, EINA_FALSE},
+  {EOLIAN_TYPE_BUILTIN_INT32, 32, EINA_TRUE},
+  {EOLIAN_TYPE_BUILTIN_UINT32, 32, EINA_FALSE},
+  {EOLIAN_TYPE_BUILTIN_INT64, 64, EINA_TRUE},
+  {EOLIAN_TYPE_BUILTIN_UINT64, 64, EINA_FALSE},
+  {EOLIAN_TYPE_BUILTIN_INT128, 128, EINA_TRUE},
+  {EOLIAN_TYPE_BUILTIN_UINT128, 128, EINA_FALSE},
+  {EOLIAN_TYPE_BUILTIN_INVALID, 0, 0}
+};
+
 Eina_Future*
 change_value(Outputter_Property_Value *value, Eo *anchor_widget)
 {
@@ -94,7 +127,31 @@ change_value(Outputter_Property_Value *value, Eo *anchor_widget)
         selection->set = data->ok;
         selection->selector = data->range_selector;
         selection->get_value = _fetch_int_range_cb;
+        int rel_index = btype - EOLIAN_TYPE_BUILTIN_BYTE;
+        Numeric_Int_Ranges range = ranges[rel_index];
+        EINA_SAFETY_ON_FALSE_RETURN_VAL(range.type == btype, NULL);
+        double min = 0, max = 0;
+
+        if (range.size > DBL_MANT_DIG)
+          {
+             printf("Warning, the selector in the editor can only handle at max %d\n", (int)pow(2, DBL_MANT_DIG));
+             range.size = DBL_MANT_DIG;
+          }
+
+        if (range.sign)
+          {
+             min = -pow(2, range.size - 1);
+             max = pow(2, range.size - 1) - 1;
+          }
+        else
+          {
+             min = 0.0;
+             max = pow(2, range.size - 1);
+          }
+
+        efl_ui_range_limits_set(data->range_selector, min, max);
         efl_ui_range_value_set(data->range_selector, atoi(value->value));
+        efl_ui_spin_button_direct_text_input_set(data->range_selector, EINA_TRUE);
      }
    else if (btype >= EOLIAN_TYPE_BUILTIN_FLOAT && btype <= EOLIAN_TYPE_BUILTIN_DOUBLE)
      {
@@ -103,7 +160,10 @@ change_value(Outputter_Property_Value *value, Eo *anchor_widget)
         selection->set = data->ok;
         selection->selector = data->range_selector;
         selection->get_value = _fetch_float_range_cb;
+        efl_ui_range_limits_set(data->range_selector, -300000, 300000);
+        efl_ui_range_step_set(data->range_selector, 0.1);
         efl_ui_range_value_set(data->range_selector, atof(value->value));
+        efl_ui_spin_button_direct_text_input_set(data->range_selector, EINA_TRUE);
      }
    else if (btype == EOLIAN_TYPE_BUILTIN_BOOL)
      {
