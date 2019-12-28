@@ -35,6 +35,7 @@ get_available_types(void)
    if (!all_widgets)
      {
          Eina_Array *w = find_all_widgets(state);
+         EINA_SAFETY_ON_NULL_RETURN_VAL(w, NULL);
          all_widgets = calloc(eina_array_count(w) + 1, sizeof(Predicted_Class));
          all_widgets[eina_array_count(w)].klass_name = NULL;
          all_widgets[eina_array_count(w)].obj.documentation = NULL;
@@ -54,6 +55,7 @@ Predicted_Property*
 get_available_properties(Efl_Ui_Node *node)
 {
    Eina_Array *tmp_array = find_all_properties(state, node->type);
+   EINA_SAFETY_ON_NULL_RETURN_VAL(tmp_array, NULL);
    Predicted_Property *result = calloc(eina_array_count(tmp_array) + 1, sizeof(Predicted_Property));
    result[eina_array_count(tmp_array)].name = NULL;
    for (int i = 0; i < eina_array_count(tmp_array); ++i)
@@ -71,6 +73,7 @@ Predicted_Property_Details*
 get_available_property_details(Efl_Ui_Node *node, const char *property_name)
 {
    Eina_Array *tmp_array = find_all_arguments(state, node->type, property_name);
+   EINA_SAFETY_ON_NULL_RETURN_VAL(tmp_array, NULL);
    Predicted_Property_Details *details = calloc(eina_array_count(tmp_array) + 1, sizeof(Predicted_Property_Details));
    details[eina_array_count(tmp_array)].name = NULL;
    for (int i = 0; i < eina_array_count(tmp_array); ++i)
