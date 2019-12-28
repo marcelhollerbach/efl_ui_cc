@@ -12,7 +12,8 @@
        "part" : "icon",
        "content" :   {
         "type" : "Efl.Ui.Image",
-        "icon" : "document-new",
+        "hint_size_min" : [[15, 15]],
+        "icon" : "list-add",
       },
      }
     ],

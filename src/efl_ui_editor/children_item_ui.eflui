@@ -11,7 +11,8 @@
           "part" : "icon",
           "content" : {
               "type" : "Efl.Ui.Image",
-              "icon" : "edit-delete",
+              "hint_size_min" : [[15, 15]],
+              "icon" : "list-remove",
 
           }
         }
