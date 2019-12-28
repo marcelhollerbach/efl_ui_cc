@@ -1,19 +1,20 @@
 {
   "ui-name" : "New_Property_Item",
-  "ui-content" : {
-    "type": "Efl.Ui.List_Default_Item",
+  "ui-content" :   {
+    "type" : "Efl.Ui.List_Default_Item",
     "id" : "root",
     "text" : "New Property",
+    "focus_allow" : false,
     "pack-part" : [
-        {
-          "type" : "Efl.Ui.Button",
-          "id" : "new",
-          "part" : "icon",
-          "content" : {
-              "type" : "Efl.Ui.Image",
-              "icon" : "document-new",
-          }
-        }
-     ]
-   },
+      {
+       "type" : "Efl.Ui.Button",
+       "id" : "new",
+       "part" : "icon",
+       "content" :   {
+        "type" : "Efl.Ui.Image",
+        "icon" : "document-new",
+      },
+     }
+    ],
+  }
 }

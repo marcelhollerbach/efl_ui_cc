@@ -1,19 +1,19 @@
 {
   "ui-name" : "Property_List_Item",
-  "ui-content" : {
-    "type": "Efl.Ui.Group_Item",
+  "ui-content" :   {
+    "type" : "Efl.Ui.Group_Item",
     "id" : "root",
+    "focus_allow" : false,
     "pack-part" : [
-        {
-          "type" : "Efl.Ui.Button",
-          "id" : "delete",
-          "part" : "icon",
-          "content" : {
-              "type" : "Efl.Ui.Image",
-              "icon" : "edit-delete",
-
-          }
-        }
-     ]
-   },
+      {
+       "type" : "Efl.Ui.Button",
+       "id" : "delete",
+       "part" : "icon",
+       "content" :   {
+        "type" : "Efl.Ui.Image",
+        "icon" : "edit-delete",
+      },
+     }
+    ],
+  }
 }

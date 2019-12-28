@@ -20,7 +20,7 @@
           {
            "type" : "Efl.Ui.Textbox",
            "id" : "search_text",
-           "multiline" : true,
+           "multiline" : false,
          }
         ],
       },

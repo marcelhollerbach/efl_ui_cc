@@ -3,6 +3,7 @@
   "ui-content" : {
     "type": "Efl.Ui.List_Default_Item",
     "id" : "root",
+    "focus_allow" : false,
     "pack-part" : [
         {
           "type" : "Efl.Ui.Button",

@@ -98,7 +98,7 @@ select_available_types(void)
    efl_text_set(data->search_text, "");
    Efl_Event ev = {data->search_text, NULL, NULL};
    _text_changed_cb(data, &ev);
-
+   efl_ui_focus_util_focus(data->search_text);
 
    return eina_future_new(ctx);
 }
@@ -178,6 +178,7 @@ select_available_properties(Efl_Ui_Node *node)
    efl_gfx_hint_size_min_set(data->container, EINA_SIZE2D(250, 250));
    efl_key_data_set(data->root, "__promise", ctx);
    efl_gfx_entity_visible_set(data->root, EINA_TRUE);
+   efl_ui_focus_util_focus(data->search_text);
 
    return eina_future_new(ctx);
 }
