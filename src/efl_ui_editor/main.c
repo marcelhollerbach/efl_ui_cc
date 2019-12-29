@@ -122,7 +122,8 @@ efl_main(void *data EINA_UNUSED, const Efl_Event *ev EINA_UNUSED)
         eina_log_abort_on_critical_set(EINA_TRUE);
         efl_event_callback_add(win, EFL_CANVAS_SCENE_EVENT_RENDER_POST, _exit_cb, NULL);
      }
-   else if (format_mode)
+
+   if (format_mode)
      {
         base_ui_init(win);
         display_ui_init(win);
