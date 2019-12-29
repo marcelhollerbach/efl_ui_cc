@@ -117,8 +117,9 @@ change_value(Outputter_Property_Value *value, Eo *anchor_widget)
 
    selection->ctx = efl_loop_promise_new(efl_main_loop_get());
    const Eolian_Type *etype = value->type;
-   const Eolian_Type_Builtin_Type btype = eolian_type_builtin_type_get(etype);
    const Eolian_Typedecl *decl = eolian_type_typedecl_get(etype);
+   fetch_real_typedecl(&decl, &etype);
+   const Eolian_Type_Builtin_Type btype = eolian_type_builtin_type_get(etype);
 
    if (btype >= EOLIAN_TYPE_BUILTIN_BYTE && btype <= EOLIAN_TYPE_BUILTIN_UINT128)
      {
