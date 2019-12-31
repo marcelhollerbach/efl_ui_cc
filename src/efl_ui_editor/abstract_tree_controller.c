@@ -119,7 +119,7 @@ _insert_values(const Eolian_Type *etype, Efl_Ui_Property_Value *value)
      }
    else if (btype == EOLIAN_TYPE_BUILTIN_MSTRING || btype == EOLIAN_TYPE_BUILTIN_STRING || btype == EOLIAN_TYPE_BUILTIN_STRINGSHARE)
      {
-        property_value_value(value, "<Empty>");
+        property_value_value(value, "\"<Empty>\"");
      }
    else if (decl && eolian_typedecl_type_get(decl) == EOLIAN_TYPEDECL_ENUM)
      {
