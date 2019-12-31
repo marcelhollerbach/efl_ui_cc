@@ -1,94 +1,111 @@
 {
   "ui-name" : "Abstract_Node_Ui",
-  "ui-content" : {
-    "type": "Efl.Ui.Box",
+  "ui-content" :   {
+    "type" : "Efl.Ui.Box",
     "id" : "root",
     "homogeneous" : false,
     "pack-linear" : [
-       {
+      {
+       "type" : "Efl.Ui.Box",
+       "hint_weight" : [1.0, 0.0],
+       "orientation" : horizontal,
+       "pack-linear" : [
+         {
           "type" : "Efl.Ui.Button",
           "id" : "back",
           "text" : "back",
           "hint_weight" : [1.0, 0.0],
-          "content" : {
-              "type" : "Efl.Ui.Image",
-              "icon" : "go-previous",
-          }
-       },
-       {
-          "type" : "Efl.Ui.Box",
-          "orientation" : horizontal,
+          "content" :   {
+           "type" : "Efl.Ui.Image",
+           "icon" : "go-previous",
+         },
+        },
+         {
+          "type" : "Efl.Ui.Button",
+          "id" : "highlight",
+          "hint_weight" : [0.000000, 0.0],
+          "content" :   {
+           "type" : "Efl.Ui.Image",
+           "icon" : "go-top",
+           "hint_size_min" : [[15, 15]],
+         },
+        }
+       ],
+     },
+      {
+       "type" : "Efl.Ui.Box",
+       "orientation" : horizontal,
+       "hint_weight" : [1.0, 0.0],
+       "pack-linear" : [
+         {
+          "type" : "Efl.Ui.Textbox",
+          "text" : "Type: ",
+          "editable" : false,
+          "hint_weight" : [0.0, 0.0],
+        },
+         {
+          "type" : "Efl.Ui.Textbox",
+          "id" : "type_text",
           "hint_weight" : [1.0, 0.0],
-          "pack-linear" : [
-             {
-                "type" : "Efl.Ui.Textbox",
-                "text" : "Type: ",
-                "editable" : false,
-                "hint_weight" : [0.0, 0.0],
-             },
-             {
-                "type" : "Efl.Ui.Textbox",
-                "id" : "type_text",
-                "hint_weight" : [1.0, 0.0],
-                "editable" : false,
-             },
-             {
-                "type" : "Efl.Ui.Button",
-                "id" : "type",
-                "hint_weight" : [0.0, 0.0],
-                "content" : {
-                    "type" : "Efl.Ui.Image",
-                    "hint_size_min" : [[15, 15]],
-                    "icon" : "format-text-direction-rtl"
-                }
-             }
-          ]
-       },
-       {
-          "type" : "Efl.Ui.Box",
-          "orientation" : horizontal,
+          "editable" : false,
+        },
+         {
+          "type" : "Efl.Ui.Button",
+          "id" : "type",
+          "hint_weight" : [0.0, 0.0],
+          "content" :   {
+           "type" : "Efl.Ui.Image",
+           "hint_size_min" : [[15, 15]],
+           "icon" : "format-text-direction-rtl",
+         },
+        }
+       ],
+     },
+      {
+       "type" : "Efl.Ui.Box",
+       "orientation" : horizontal,
+       "hint_weight" : [1.0, 0.0],
+       "pack-linear" : [
+         {
+          "type" : "Efl.Ui.Textbox",
+          "text" : "ID: ",
+          "editable" : false,
+          "hint_weight" : [0.0, 0.0],
+        },
+         {
+          "type" : "Efl.Ui.Textbox",
+          "id" : "id_text",
           "hint_weight" : [1.0, 0.0],
-          "pack-linear" : [
-             {
-                "type" : "Efl.Ui.Textbox",
-                "text" : "ID: ",
-                "editable" : false,
-                "hint_weight" : [0.0, 0.0],
-             },
-             {
-                "type" : "Efl.Ui.Textbox",
-                "id" : "id_text",
-                "hint_weight" : [1.0, 0.0],
-                "editable" : false,
-             },
-             {
-                "type" : "Efl.Ui.Button",
-                "id" : "id",
-                "hint_weight" : [0.0, 0.0],
-                "content" : {
-                    "type" : "Efl.Ui.Image",
-                    "hint_size_min" : [[15, 15]],
-                    "icon" : "format-text-direction-rtl"
-                }
-             }
-          ]
-       },
-       {
-          "type" : "Efl.Ui.Frame",
-          "text" : "Properties",
-          "content" : {
-            "type" : "Efl.Ui.List",
-            "id" : "properties",
-          }
-       },
-       {
-          "type" : "Efl.Ui.Frame",
-          "text" : "Children",
-          "content" : {
-            "type" : "Efl.Ui.List",
-            "id" : "children",
-          }
-       },
-    ]
-   },
+          "editable" : false,
+        },
+         {
+          "type" : "Efl.Ui.Button",
+          "id" : "id",
+          "hint_weight" : [0.0, 0.0],
+          "content" :   {
+           "type" : "Efl.Ui.Image",
+           "hint_size_min" : [[15, 15]],
+           "icon" : "format-text-direction-rtl",
+         },
+        }
+       ],
+     },
+      {
+       "type" : "Efl.Ui.Frame",
+       "text" : "Properties",
+       "content" :   {
+        "type" : "Efl.Ui.List",
+        "id" : "properties",
+      },
+     },
+      {
+       "type" : "Efl.Ui.Frame",
+       "text" : "Children",
+       "content" :   {
+        "type" : "Efl.Ui.List",
+        "id" : "children",
+      },
+     }
+    ],
+  }
 }

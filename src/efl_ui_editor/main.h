@@ -10,10 +10,15 @@ extern Efl_Ui_Win *win;
 extern Efl_Gfx_Entity *background;
 extern Efl_Ui *ui_tree;
 
-Efl_Ui_Widget* object_generator(Efl_Ui_Win *win, const Eolian_State *s, const Efl_Ui *ui);
+typedef struct {
+   Eina_Hash *node_widget, *widget_node;
+} Object_Hash_Tuple;
+
+Efl_Ui_Widget* object_generator(Efl_Ui_Win *win, const Eolian_State *s, const Efl_Ui *ui, Object_Hash_Tuple *tuple);
 char*          json_output(const Eolian_State *s, const Efl_Ui *ui);
 void           base_ui_init(Efl_Ui_Win *win);
 void           base_ui_refresh(Efl_Ui *ui);
+void           highlight_node(Efl_Ui_Node *node);
 
 //APIs for refreshing the UI representation
 void display_ui_init(Efl_Ui_Win *win);

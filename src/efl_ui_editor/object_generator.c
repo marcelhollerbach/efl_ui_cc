@@ -11,6 +11,7 @@
 
 typedef struct {
    Eina_Strbuf *typedef_fields;
+   Eina_Hash *node_widget_map, *widget_node_map;
 } Object_Generator_Context;
 
 static Efl_Ui_Widget* _generate_node(Object_Generator_Context *ctx, Outputter_Node *n, Efl_Ui_Widget *parent);
@@ -219,11 +220,14 @@ _generate_node(Object_Generator_Context *ctx, Outputter_Node *n, Efl_Ui_Widget *
 {
    const Eolian_Class *klass;
    const Efl_Class* (*klass_func)(void);
+   const Efl_Ui_Node *node = outputter_node_get(n);
    void *obj;
 
    klass = outputter_node_klass_get(n);
    klass_func = dlsym(RTLD_DEFAULT, eolian_class_c_get_function_name_get(klass));
    obj = efl_add(klass_func(), parent);
+   eina_hash_add(ctx->widget_node_map, &obj, node);
+   eina_hash_add(ctx->node_widget_map, &node, obj);
 
    EINA_SAFETY_ON_NULL_RETURN_VAL(klass, NULL);
    EINA_SAFETY_ON_NULL_RETURN_VAL(klass_func, NULL);
@@ -275,10 +279,13 @@ _obj_gen_transform_value_cb(const Eolian_Type *etype, Eina_Strbuf *buf, const ch
 }
 
 Efl_Ui_Widget*
-object_generator(Efl_Ui_Win *win, const Eolian_State *s, const Efl_Ui *ui)
+object_generator(Efl_Ui_Win *win, const Eolian_State *s, const Efl_Ui *ui, Object_Hash_Tuple *tuple)
 {
    Object_Generator_Context ctx;
    const char *name;
+
+   tuple->node_widget = ctx.node_widget_map = eina_hash_pointer_new(NULL);
+   tuple->widget_node = ctx.widget_node_map = eina_hash_pointer_new(NULL);
 
    Outputter_Node *root = outputter_node_init((Eolian_State*)s, (Efl_Ui*)ui, &name, _obj_gen_transform_value_cb);
    Eo *ret = _generate_node(&ctx, root, win);

@@ -313,6 +313,13 @@ _invalidate_cb(void *data, const Efl_Event *ev)
    free(stack);
 }
 
+static void
+_highlight_clicked_cb(void *data, const Efl_Event *ev)
+{
+   Local_Stack *stack = data;
+
+   highlight_node(stack->tnode);
+}
 
 static void
 push_ui_node(Outputter_Node *node, Eina_Bool back_support)
@@ -331,6 +338,7 @@ push_ui_node(Outputter_Node *node, Eina_Bool back_support)
    efl_event_callback_add(stack->data->type, EFL_INPUT_EVENT_CLICKED, _change_node_type_cb, stack);
    efl_event_callback_add(stack->data->id, EFL_INPUT_EVENT_CLICKED, _change_id_cb, stack);
    efl_event_callback_add(stack->data->root, EFL_EVENT_INVALIDATE, _invalidate_cb, stack);
+   efl_event_callback_add(stack->data->highlight, EFL_INPUT_EVENT_CLICKED, _highlight_clicked_cb, stack);
    ui_node_flush(stack);
    efl_ui_spotlight_push(base_ui->prop_stack, stack->data->root);
 
