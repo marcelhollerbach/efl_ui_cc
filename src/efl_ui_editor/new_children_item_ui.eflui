@@ -15,6 +15,16 @@
         "hint_size_min" : [[15, 15]],
         "icon" : "list-add",
       },
+     },
+      {
+       "type" : "Efl.Ui.Button",
+       "id" : "details",
+       "part" : "extra",
+       "content" :   {
+        "type" : "Efl.Ui.Image",
+        "icon" : "document-properties",
+        "hint_size_min" : [[15, 15]],
+      },
      }
     ],
   }

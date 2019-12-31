@@ -61,6 +61,10 @@ API_NAME ##_cb (void *data, const Efl_Event *ev) \
    eina_future_then(f, API_NAME ##_delivery_cb, stack); \
 }
 
+UI_FEATURE(_change_linear_details, change_linear_details(stack->tnode, name), linear_change_ui(stack->tnode, ev->object), Local_Stack);
+UI_FEATURE(_change_table_details, change_table_details(stack->tnode, name), table_change_ui(stack->tnode, ev->object), Local_Stack);
+UI_FEATURE(_change_part_details, change_part_details(stack->tnode, name), part_change_ui(stack->tnode, ev->object), Local_Stack);
+
 //called when a new value is set to a parameter
 UI_FEATURE(_change_argument_value, change_parameter_type(outputter_property_value_value_get(stack), name), change_value(data, ev->object), void)
 
@@ -212,19 +216,20 @@ children_flush(Local_Stack *data)
    type = outputter_node_possible_types_get(data->onode);
    efl_pack_clear(data->data->children);
 
-#define ITEM_GROUP(t, l, text, cb) \
+#define ITEM_GROUP(t, l, text, cb, cb2) \
    if (type & t) \
      { \
         New_Child_Item_Data *new_child = new_child_item_gen(data->data->children); \
         l = new_child->root; \
         efl_event_callback_add(new_child->new, EFL_INPUT_EVENT_CLICKED, cb, data); \
+        efl_event_callback_add(new_child->details, EFL_INPUT_EVENT_CLICKED, cb2, data); \
         efl_pack_end(data->data->children, new_child->root); \
         efl_text_set(new_child->root, text); \
         free(new_child); \
      }
-   ITEM_GROUP(EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR, linear, "Linear", _add_new_child_linear_cb)
-   ITEM_GROUP(EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE, table, "Table", _add_new_child_table_cb)
-   ITEM_GROUP(EFL_UI_NODE_CHILDREN_TYPE_PACK, part, "Part", _add_new_child_part_cb)
+   ITEM_GROUP(EFL_UI_NODE_CHILDREN_TYPE_PACK_LINEAR, linear, "Linear", _add_new_child_linear_cb, _change_linear_details_cb)
+   ITEM_GROUP(EFL_UI_NODE_CHILDREN_TYPE_PACK_TABLE, table, "Table", _add_new_child_table_cb, _change_table_details_cb)
+   ITEM_GROUP(EFL_UI_NODE_CHILDREN_TYPE_PACK, part, "Part", _add_new_child_part_cb, _change_part_details_cb)
 
    EINA_ITERATOR_FOREACH(children, child)
      {

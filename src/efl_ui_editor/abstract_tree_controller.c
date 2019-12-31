@@ -244,3 +244,87 @@ safe_file(void)
 
    printf("File stored in %s\n", output);
 }
+void
+change_linear_details(Efl_Ui_Node *n, const char *new_details)
+{
+   unsigned int count;
+   char **details = eina_str_split_full(new_details, ";", 0, &count);
+   Eina_Array *new_children = eina_array_new(10);
+
+   EINA_SAFETY_ON_FALSE_RETURN(eina_array_count(n->children_linear) == count);
+
+   for (int x = 0; x < count; ++x)
+     {
+        int dx = atoi(details[x]);
+        for (int y = 0; y < count; ++y)
+          {
+             int dy = atoi(details[y]);
+             if (x != y && dx == dy)
+               {
+                  EINA_LOG_ERR("Error, duplicated entry in %s", new_details);
+                  return;
+               }
+          }
+     }
+
+   for (int i = 0; i < count; ++i)
+     {
+        int x = atoi(details[i]);
+        Efl_Ui_Pack_Linear *linear = eina_array_data_get(n->children_linear, x);
+        eina_array_push(new_children, linear);
+     }
+   eina_array_free(n->children_linear);
+   n->children_linear = new_children;
+
+   EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
+   base_ui_refresh(ui_tree);
+   display_ui_refresh(ui_tree);
+}
+
+void
+change_table_details(Efl_Ui_Node *n, const char *new_details)
+{
+   unsigned int count;
+   char **details = eina_str_split_full(new_details, ";", 0, &count);
+
+   EINA_SAFETY_ON_FALSE_RETURN(eina_array_count(n->children_table) == count);
+
+   for (int i = 0; i < count; ++i)
+     {
+        unsigned int inner_count;
+        char **inner_details = eina_str_split_full(details[i], ":", 0, &inner_count);
+
+        EINA_SAFETY_ON_FALSE_RETURN(inner_count == 4);
+
+        Efl_Ui_Pack_Table *table = eina_array_data_get(n->children_table, i);
+        table->x = inner_details[0];
+        table->y = inner_details[1];
+        table->w = inner_details[2];
+        table->h = inner_details[3];
+     }
+
+   EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
+   base_ui_refresh(ui_tree);
+   display_ui_refresh(ui_tree);
+}
+
+void
+change_part_details(Efl_Ui_Node *n, const char *new_details)
+{
+   unsigned int count;
+   char **details = eina_str_split_full(new_details, ";", 0, &count);
+
+   EINA_SAFETY_ON_FALSE_RETURN(eina_array_count(n->children_part) == count);
+
+   for (int i = 0; i < count; ++i)
+     {
+        char *name = eina_strdup(details[i]);
+
+        Efl_Ui_Pack_Pack *pack = eina_array_data_get(n->children_part, i);
+        pack->part_name = name;
+     }
+
+   EINA_SAFETY_ON_FALSE_RETURN(validate(editor_state, ui_tree));
+   base_ui_refresh(ui_tree);
+   display_ui_refresh(ui_tree);
+}

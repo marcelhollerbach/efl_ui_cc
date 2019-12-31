@@ -1,0 +1,46 @@
+{
+  "ui-name" : "Reorder_Ui_Table_Item",
+  "ui-content" :   {
+    "type" : "Efl.Ui.List_Default_Item",
+    "id" : "root",
+    "focus_allow" : false,
+    "pack-part" : [
+      {
+       "type" : "Efl.Ui.Box",
+       "part" : "extra",
+       "orientation" : horizontal,
+       "pack-linear" : [
+         {
+          "type" : "Efl.Ui.Textbox",
+          "id" : "tmp_name",
+          "text" : "<Empty>",
+          "multiline" : false,
+          "hint_align" : [0.0, 0.500000],
+          "hint_weight" : [0.0, 0.0],
+          "editable" : false,
+        },
+         {
+          "type" : "Efl.Ui.Spin_Button",
+          "id" : "x",
+          "orientation" : vertical,
+        },
+         {
+          "type" : "Efl.Ui.Spin_Button",
+          "id" : "y",
+          "orientation" : vertical,
+        },
+         {
+          "type" : "Efl.Ui.Spin_Button",
+          "id" : "w",
+          "orientation" : vertical,
+        },
+         {
+          "type" : "Efl.Ui.Spin_Button",
+          "id" : "h",
+          "orientation" : vertical,
+        }
+       ],
+     }
+    ],
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "ui-name" : "Reorder_Ui_Linear_Item",
+  "ui-content" :   {
+    "type" : "Efl.Ui.List_Default_Item",
+    "id" : "root",
+    "content" :   {
+     "type" : "Efl.Ui.Box",
+     "orientation" : horizontal,
+     "hint_weight" : [0.0, 0.0],
+     "pack-linear" : [
+       {
+        "type" : "Efl.Ui.Button",
+        "id" : "up",
+        "content" :   {
+         "type" : "Efl.Ui.Image",
+         "icon" : "go-up",
+       },
+      },
+       {
+        "type" : "Efl.Ui.Button",
+        "id" : "down",
+        "content" :   {
+         "type" : "Efl.Ui.Image",
+         "icon" : "go-down",
+       },
+      }
+     ],
+   },
+  }
+}

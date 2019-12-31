@@ -29,6 +29,9 @@ void change_parameter_type(Efl_Ui_Property_Value *value, const char *v);
 void change_id(Efl_Ui_Node *node, const char *new_id);
 void file_set(const char *input_file, const char *output_file);
 void safe_file(void);
+void change_linear_details(Efl_Ui_Node *n, const char *new_details);
+void change_table_details(Efl_Ui_Node *n, const char *new_details);
+void change_part_details(Efl_Ui_Node *n, const char *new_details);
 
 //UIs for selecting Types and properties
 Eina_Future* select_available_types(void);
@@ -37,5 +40,9 @@ Eina_Future* select_available_properties(Efl_Ui_Node *node);
 //UI for selecting a parameter value
 Eina_Future *change_value(Outputter_Property_Value *value, Eo *anchor_widget);
 Eina_Future* change_name(Efl_Ui_Node *node, Eo *anchor_widget);
+
+Eina_Future* linear_change_ui(Efl_Ui_Node *node, Eo *anchor_widget);
+Eina_Future* table_change_ui(Efl_Ui_Node *node, Eo *anchor_widget);
+Eina_Future* part_change_ui(Efl_Ui_Node *node, Eo *anchor_widget);
 
 #endif

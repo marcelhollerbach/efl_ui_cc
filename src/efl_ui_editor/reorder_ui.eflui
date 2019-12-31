@@ -1,0 +1,30 @@
+{
+  "ui-name" : "Reorder_Ui",
+  "ui-content" :   {
+    "type" : "Efl.Ui.Popup",
+    "id" : "root",
+    "content" :   {
+     "type" : "Efl.Ui.Box",
+     "pack-linear" : [
+       {
+        "type" : "Efl.Ui.Textbox",
+        "id" : "promotion_text",
+        "text" : "<Overwrite>",
+        "multiline" : true,
+        "hint_weight" : [1.000000, 0.0],
+        "editable" : false,
+      },
+       {
+        "type" : "Efl.Ui.List",
+        "id" : "container",
+      },
+       {
+        "type" : "Efl.Ui.Button",
+        "id" : "ok",
+        "hint_weight" : [1.000000, 0.0],
+        "text" : "Ok",
+      }
+     ],
+   },
+  }
+}
