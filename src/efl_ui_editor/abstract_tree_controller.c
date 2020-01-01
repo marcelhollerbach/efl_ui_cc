@@ -151,6 +151,16 @@ add_property(Efl_Ui_Node *node, const char *prop_name)
    Efl_Ui_Property *property;
    Predicted_Property_Details *details;
 
+   for (int i = 0; i < eina_array_count(node->properties); ++i)
+     {
+        property = eina_array_data_get(node->properties, i);
+        if (eina_streq(prop_name, property->key))
+          {
+             EINA_LOG_ERR("Duplicated entry %s", prop_name);
+             return;
+          }
+     }
+
    property = node_property_append(node);
    property_key_set(property, prop_name);
 
