@@ -1,60 +1,60 @@
 {
   "ui-name" : "Base_Ui",
-  "ui-content" : {
-    "type": "Efl.Ui.Panes",
+  "ui-content" :   {
+    "type" : "Efl.Ui.Panes",
     "id" : "root",
     "split_ratio" : 0.2,
     "orientation" : vertical,
     "pack-part" : [
-       {
-          "type" : "Efl.Ui.Stack",
-          "id" : "prop_stack",
-          "part" : "first",
-       },
-       {
+      {
+       "type" : "Efl.Ui.Stack",
+       "id" : "prop_stack",
+       "part" : "first",
+     },
+      {
+       "type" : "Efl.Ui.Box",
+       "part" : "second",
+       "pack-linear" : [
+         {
           "type" : "Efl.Ui.Box",
-          "part" : "second",
+          "orientation" : horizontal,
+          "hint_weight" : [1.0, 0.0],
+          "hint_size_min" : [[40, 40]],
           "pack-linear" : [
-              {
-                "type" : "Efl.Ui.Box",
-                "orientation" : horizontal,
-                "hint_weight" : [1.0, 0.0],
-                "hint_size_min" : [[40, 40]],
-                "pack-linear" : [
-                  {
-                    "type" : "Efl.Ui.Button",
-                    "id" : "save",
-                    "text" : "Save",
-                    "hint_weight" : [0.1, 1.0],
-                    "content" : {
-                      "type" : "Efl.Ui.Image",
-                      "icon" : "document-save"
-                    }
-                  },
-                  {
-                    "type" : "Efl.Ui.Button",
-                    "id" : "refresh",
-                    "text" : "Refresh",
-                    "hint_weight" : [0.1, 1.0],
-                    "content" : {
-                      "type" : "Efl.Ui.Image",
-                      "icon" : "document-send"
-                    }
-                  },
-                  {
-                     "type" : "Efl.Canvas.Rectangle",
-                     "color" : [0, 0, 0, 0],
-                     "hint_weight" : [1.0, 1.0],
-                  }
-                ]
-              },
-              {
-                 "type" : "Efl.Canvas.Rectangle",
-                 "id" : "background",
-                 "hint_weight" : [1.0, 1.0],
-              }
-          ]
-       }
-    ]
-   },
+            {
+             "type" : "Efl.Ui.Button",
+             "id" : "save",
+             "text" : "Save",
+             "hint_weight" : [0.1, 1.0],
+             "content" :   {
+              "type" : "Efl.Ui.Image",
+              "icon" : "document-save",
+            },
+           },
+            {
+             "type" : "Efl.Ui.Button",
+             "id" : "ui_name",
+             "text" : "Ui-Name",
+             "hint_weight" : [0.1, 1.0],
+             "content" :   {
+              "type" : "Efl.Ui.Image",
+              "icon" : "document-send",
+            },
+           },
+            {
+             "type" : "Efl.Canvas.Rectangle",
+             "color" : [0, 0, 0, 0],
+             "hint_weight" : [1.0, 1.0],
+           }
+          ],
+        },
+         {
+          "type" : "Efl.Canvas.Rectangle",
+          "id" : "background",
+          "hint_weight" : [1.0, 1.0],
+        }
+       ],
+     }
+    ],
+  }
 }

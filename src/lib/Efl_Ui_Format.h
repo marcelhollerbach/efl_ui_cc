@@ -1,11 +1,12 @@
 #ifndef EFL_UI_FORMAT_H
 #define EFL_UI_FORMAT_H 1
 
+typedef struct _Efl_Ui Efl_Ui;
+
 #include <Eina.h>
 #include <Eolian.h>
 #include <abstract_tree.h>
 
-typedef struct _Efl_Ui Efl_Ui;
 
 Efl_Ui* efl_ui_format_parse(const char *input_content);
 Eina_Bool validate(Eolian_State *state, Efl_Ui *ui);

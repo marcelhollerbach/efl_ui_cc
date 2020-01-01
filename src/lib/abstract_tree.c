@@ -149,6 +149,12 @@ efl_ui_name_set(Efl_Ui *ui, const char *name)
    ui->name = eina_strdup(name);
 }
 
+const char *
+efl_ui_name_get(Efl_Ui *ui)
+{
+  return ui->name;
+}
+
 Efl_Ui_Node*
 efl_ui_content_get(Efl_Ui *ui)
 {

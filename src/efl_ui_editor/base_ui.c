@@ -51,6 +51,7 @@ static Eina_Value \
 API_NAME ##_delivery_cb(void *data, const Eina_Value value, const Eina_Future *f) \
 { \
    T *stack = data; \
+   (void) stack; \
    if (eina_value_type_get(&value) != EINA_VALUE_TYPE_ERROR) \
      { \
          const char *name; \
@@ -66,6 +67,9 @@ API_NAME ##_cb (void *data, const Efl_Event *ev) \
    Eina_Future *f = UI_GENERATOR_CALL; \
    eina_future_then(f, API_NAME ##_delivery_cb, stack); \
 }
+
+//called when a new value is set to a parameter
+UI_FEATURE(_change_ui_name, change_ui_name(name), change_string_name(efl_ui_name_get(ui_tree), ev->object), void)
 
 UI_FEATURE(_change_linear_details, change_linear_details(stack->tnode, name), linear_change_ui(stack->tnode, ev->object), Local_Stack);
 UI_FEATURE(_change_table_details, change_table_details(stack->tnode, name), table_change_ui(stack->tnode, ev->object), Local_Stack);
@@ -466,7 +470,7 @@ base_ui_init(Efl_Ui_Win *win)
    base_ui = base_ui_gen(win);
    efl_content_set(win, base_ui->root);
    efl_event_callback_add(base_ui->save, EFL_INPUT_EVENT_CLICKED, _save_cb, NULL);
-   efl_ui_widget_disabled_set(base_ui->refresh, EINA_TRUE);
+   efl_event_callback_add(base_ui->ui_name, EFL_INPUT_EVENT_CLICKED, _change_ui_name_cb, NULL);
    efl_event_callback_add(win, EFL_EVENT_INVALIDATE, _win_gone_cb, NULL);
    background = base_ui->background;
 }

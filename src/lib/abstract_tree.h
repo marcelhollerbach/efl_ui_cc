@@ -27,6 +27,8 @@ typedef struct _Efl_Ui_Pack_Pack Efl_Ui_Pack_Pack;
 typedef struct _Efl_Ui_Pack_Basic Efl_Ui_Pack_Basic;
 typedef struct _Efl_Ui_Struct Efl_Ui_Struct;
 
+const char * efl_ui_name_get(Efl_Ui *ui);
+
 void node_delete_children(Efl_Ui_Node *node, enum Efl_Ui_Node_Children_Type type);
 Efl_Ui_Property* node_property_append(Efl_Ui_Node *n);
 void node_id_set(Efl_Ui_Node *n, const char *id);

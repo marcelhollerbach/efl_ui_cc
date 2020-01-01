@@ -1,28 +1,29 @@
 {
   "ui-name" : "Value_Change_Text_Ui",
-  "ui-content" : {
-    "type": "Efl.Ui.Popup",
+  "ui-content" :   {
+    "type" : "Efl.Ui.Popup",
     "id" : "root",
-    "content" : {
-      "type" : "Efl.Ui.Box",
-      "pack-linear" : [
-        {
-          "type" : "Efl.Ui.Textbox",
-          "editable" : false,
-          "multiline" : false,
-          "text" : "Change the text:"
-        },
-        {
-          "type" : "Efl.Ui.Textbox",
-          "multiline" : false,
-          "id" : "text_selector",
-        },
-        {
-           "type" : "Efl.Ui.Button",
-           "text" : "Set",
-           "id" : "ok"
-        }
-      ]
-    }
+    "content" :   {
+     "type" : "Efl.Ui.Box",
+     "pack-linear" : [
+       {
+        "type" : "Efl.Ui.Textbox",
+        "id" : "headline",
+        "editable" : false,
+        "multiline" : false,
+        "text" : "<Empty>",
+      },
+       {
+        "type" : "Efl.Ui.Textbox",
+        "id" : "text_selector",
+        "multiline" : false,
+      },
+       {
+        "type" : "Efl.Ui.Button",
+        "id" : "ok",
+        "text" : "Set",
+      }
+     ],
+   },
   }
 }

@@ -338,3 +338,11 @@ change_part_details(Efl_Ui_Node *n, const char *new_details)
    base_ui_refresh(ui_tree);
    display_ui_refresh(ui_tree);
 }
+
+void
+change_ui_name(const char *name)
+{
+   efl_ui_name_set(ui_tree, name);
+   base_ui_refresh(ui_tree);
+   display_ui_refresh(ui_tree);
+}
