@@ -397,7 +397,13 @@ base_ui_refresh(Efl_Ui *ui)
 {
    const char *name;
    Outputter_Node *oroot = outputter_node_init(editor_state, ui, &name, _base_ui_transform_value_cb);
-   //efl_text_set(base_ui->ui_name, name);
+   Eina_Strbuf *title = eina_strbuf_new();
+
+   eina_strbuf_append(title, "EFL UI Editor - ");
+   eina_strbuf_append(title, name);
+   efl_text_set(win, eina_strbuf_string_get(title));
+   eina_strbuf_free(title);
+   title = NULL;
 
    if (!root && !highest)
      {
