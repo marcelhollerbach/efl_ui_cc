@@ -146,7 +146,7 @@ _fill_property_values(Efl_Ui_Group_Item *item, Eina_Iterator *values, const char
         else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_STRUCT)
           eina_strbuf_append(displayed_value, "Struct");
         else if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_NODE)
-          eina_strbuf_append(displayed_value, "Object");
+          eina_strbuf_append(displayed_value, eolian_object_name_get(EOLIAN_OBJECT(outputter_node_klass_get(value->object))));
 
         if (value->node_type == EFL_UI_PROPERTY_VALUE_TYPE_VALUE)
           {
