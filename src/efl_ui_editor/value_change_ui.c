@@ -165,6 +165,7 @@ change_value(Outputter_Property_Value *value, Eo *anchor_widget)
         efl_ui_range_step_set(data->range_selector, 0.1);
         efl_ui_range_value_set(data->range_selector, atof(value->value));
         efl_ui_spin_button_direct_text_input_set(data->range_selector, EINA_TRUE);
+        efl_ui_format_string_set(data->range_selector, "%.3f", EFL_UI_FORMAT_STRING_TYPE_SIMPLE);
      }
    else if (btype == EOLIAN_TYPE_BUILTIN_BOOL)
      {
