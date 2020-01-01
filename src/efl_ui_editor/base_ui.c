@@ -27,6 +27,7 @@ static Base_Ui_Data *base_ui;
 Efl_Gfx_Entity *background;
 
 static void push_ui_node(Outputter_Node *node, Eina_Bool back_support);
+static void invalidate_local_unlink(Local_Stack *stack);
 
 static void
 _push_node_cb(void *data, const Efl_Event *ev)
@@ -37,7 +38,12 @@ _push_node_cb(void *data, const Efl_Event *ev)
 static void
 _back_cb(void *data, const Efl_Event *ev)
 {
-   efl_ui_spotlight_pop(base_ui->prop_stack, EINA_TRUE);
+   Local_Stack *stack = data;
+   if (efl_ui_spotlight_active_element_get(base_ui->prop_stack) == stack->data->root)
+     {
+        invalidate_local_unlink(stack);
+        efl_ui_spotlight_pop(base_ui->prop_stack, EINA_TRUE);
+     }
 }
 
 #define UI_FEATURE(API_NAME, CONTROLLER_API_CALL, UI_GENERATOR_CALL, T) \
@@ -292,13 +298,13 @@ ui_node_flush(Local_Stack *data)
 }
 
 static void
-_invalidate_cb(void *data, const Efl_Event *ev)
+invalidate_local_unlink(Local_Stack *stack)
 {
-   Local_Stack *stack = data, *lower, *higher;
+   Local_Stack *lower, *higher;
 
-   if (highest == data)
+   if (highest == stack)
      highest = stack->parent;
-   if (root == data)
+   if (root == stack)
      root = stack->next;
 
    lower = stack->parent;
@@ -308,9 +314,22 @@ _invalidate_cb(void *data, const Efl_Event *ev)
      lower->next = higher;
    if (higher)
      higher->parent = lower;
+}
 
+static void
+invalidate_local_stack(Local_Stack *stack)
+{
+   invalidate_local_unlink(stack);
    free(stack->data);
    free(stack);
+}
+
+static void
+_invalidate_cb(void *data, const Efl_Event *ev)
+{
+   Local_Stack *stack = data;
+
+   invalidate_local_stack(stack);
 }
 
 static void
@@ -333,7 +352,7 @@ push_ui_node(Outputter_Node *node, Eina_Bool back_support)
    if (!back_support)
      efl_ui_widget_disabled_set(stack->data->back, !back_support);
 
-   efl_event_callback_add(stack->data->back, EFL_INPUT_EVENT_CLICKED, _back_cb, NULL);
+   efl_event_callback_add(stack->data->back, EFL_INPUT_EVENT_CLICKED, _back_cb, stack);
    //change of type
    efl_event_callback_add(stack->data->type, EFL_INPUT_EVENT_CLICKED, _change_node_type_cb, stack);
    efl_event_callback_add(stack->data->id, EFL_INPUT_EVENT_CLICKED, _change_id_cb, stack);
