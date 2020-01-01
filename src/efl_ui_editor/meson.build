@@ -18,7 +18,7 @@ ui_files = [
   'reorder_ui',
   'reorder_ui_linear_item',
   'reorder_ui_table_item',
-  'reorder_ui_part_item'
+  'reorder_ui_part_item',
 ]
 gen_files = []
 
@@ -33,7 +33,7 @@ endforeach
 editor = executable('efl_ui_editor',
   ['main.c', 'json_generator.c', 'object_generator.c',
    'base_ui.c', 'display_ui.c', 'abstract_tree_controller.c',
-   'predictor_ui.c', 'value_change_ui.c', 'reorder_ui.c', gen_files],
+   'predictor_ui.c', 'value_change_ui.c', 'reorder_ui.c', 'ui_helper.c', gen_files],
   dependencies: [dependency('eolian'), dependency('efl-ui'), efl_ui_format, dependency('libffi'), dl],
   install: true,
 )

@@ -19,6 +19,8 @@ char*          json_output(const Eolian_State *s, const Efl_Ui *ui);
 void           base_ui_init(Efl_Ui_Win *win);
 void           base_ui_refresh(Efl_Ui *ui);
 void           highlight_node(Efl_Ui_Node *node);
+void           animated_visible_set(Eo *obj, Eina_Bool visible);
+void           ui_helper_init(void);
 
 //APIs for refreshing the UI representation
 void display_ui_init(Efl_Ui_Win *win);

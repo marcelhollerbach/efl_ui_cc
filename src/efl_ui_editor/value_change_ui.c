@@ -222,10 +222,10 @@ change_value(Outputter_Property_Value *value, Eo *anchor_widget)
      }
 
    efl_ui_popup_anchor_set(selection->popup, anchor_widget);
+   efl_ui_popup_align_set(selection->popup, EFL_UI_POPUP_ALIGN_RIGHT);
    efl_event_callback_add(selection->set, EFL_INPUT_EVENT_CLICKED, _set_clicked_cb, selection);
    efl_event_callback_add(selection->popup, EFL_UI_POPUP_EVENT_BACKWALL_CLICKED, _close_cb, selection);
-   efl_gfx_entity_visible_set(selection->popup, EINA_TRUE);
-
+   animated_visible_set(selection->popup, EINA_TRUE);
    return eina_future_new(selection->ctx);
 }
 
@@ -242,7 +242,7 @@ _name_setting_cb(void *data, const Efl_Event *ev)
 }
 
 static Eina_Future*
-_change_string_name(const char *title, const char *name, Eo *anchor_widget)
+_change_string_name(const char *title, const char *name, Eo *anchor_widget, Efl_Ui_Popup_Align align)
 {
    Value_Selection *s = calloc(1, sizeof(Value_Selection));
    Value_Change_Text_Ui_Data *data = value_change_text_ui_gen(win);
@@ -251,14 +251,16 @@ _change_string_name(const char *title, const char *name, Eo *anchor_widget)
    s->popup = data->root;
 
    efl_ui_popup_anchor_set(data->root, anchor_widget);
+   efl_ui_popup_align_set(data->root, align);
    efl_event_callback_add(data->ok, EFL_INPUT_EVENT_CLICKED, _name_setting_cb, s);
    efl_event_callback_add(s->popup, EFL_UI_POPUP_EVENT_BACKWALL_CLICKED, _close_cb, s);
-   efl_gfx_entity_visible_set(data->root, EINA_TRUE);
    efl_text_set(s->selector, efl_ui_name_get(ui_tree));
    efl_text_set(data->headline, title);
 
    efl_ui_focus_util_focus(s->selector);
    efl_text_interactive_all_select(s->selector);
+
+   animated_visible_set(data->root, EINA_TRUE);
 
    return eina_future_new(s->ctx);
 }
@@ -266,11 +268,11 @@ _change_string_name(const char *title, const char *name, Eo *anchor_widget)
 Eina_Future*
 change_string_name(const char *name, Eo *anchor_widget)
 {
-   return _change_string_name("Change name", name, anchor_widget);
+   return _change_string_name("Change name", name, anchor_widget, EFL_UI_POPUP_ALIGN_BOTTOM);
 }
 
 Eina_Future*
 change_name(Efl_Ui_Node *node, Eo *anchor_widget)
 {
-   return _change_string_name("Change the text", node_id_get(node), anchor_widget);
+   return _change_string_name("Change the text", node_id_get(node), anchor_widget, EFL_UI_POPUP_ALIGN_RIGHT);
 }
