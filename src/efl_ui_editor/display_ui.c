@@ -32,14 +32,14 @@ display_ui_init(Efl_Ui_Win *win EINA_UNUSED)
    efl_event_callback_add(background, EFL_GFX_ENTITY_EVENT_POSITION_CHANGED, _geom_changed_cb, NULL);
    efl_event_callback_add(background, EFL_GFX_ENTITY_EVENT_SIZE_CHANGED, _geom_changed_cb, NULL);
 
-   up = efl_new(EFL_CANVAS_ANIMATION_TRANSLATE_CLASS, NULL);
+   up = efl_new(EFL_CANVAS_TRANSLATE_ANIMATION_CLASS, NULL);
    efl_animation_translate_set(up, EINA_POSITION2D(0, 0), EINA_POSITION2D(0, -45));
 
-   down = efl_new(EFL_CANVAS_ANIMATION_TRANSLATE_CLASS, NULL);
+   down = efl_new(EFL_CANVAS_TRANSLATE_ANIMATION_CLASS, NULL);
    efl_animation_translate_set(down, EINA_POSITION2D(0, -45), EINA_POSITION2D(0, 0));
    efl_animation_interpolator_set(down, efl_new(EFL_BOUNCE_INTERPOLATOR_CLASS, efl_bounce_interpolator_bounces_set(efl_added, 3)));
 
-   animation = efl_new(EFL_CANVAS_ANIMATION_GROUP_SEQUENTIAL_CLASS);
+   animation = efl_new(EFL_CANVAS_SEQUENTIAL_GROUP_ANIMATION_CLASS);
    efl_animation_group_animation_add(animation, up);
    efl_animation_group_animation_add(animation, down);
    efl_animation_duration_set(animation, 1.5);
